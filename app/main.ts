@@ -98,11 +98,32 @@ try {
     win.minimize();
   });
 
-  // app.whenReady().then(() => {
-  //   installExtension(REDUX_DEVTOOLS)
-  //     .then((name) => console.log(`Added Extension:  ${name}`))
-  //     .catch((err) => console.log('An error occurred: ', err));
-  // });
+  ipcMain.handle('load-config', async (event) => {
+    let config = storage.getSync('config');
+
+    if (Object.keys(config).length === 0) {
+      // First time running, let's initialize
+      config = {
+        gamePath: '',
+        lastCheckedHash: ''
+      }
+
+      storage.set('config', config, { prettyPrinting: true}, function(error) {
+        if (error) throw error;
+      });
+
+      return config;
+    }
+
+
+
+  });
+
+  app.whenReady().then(() => {
+    installExtension(REDUX_DEVTOOLS)
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
+  });
 
 } catch (e) {
   // Catch Error

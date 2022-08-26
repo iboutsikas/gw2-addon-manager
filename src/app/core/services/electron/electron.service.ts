@@ -5,6 +5,10 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import { AppConfig } from '../../../store/state';
+import * as appActions from '../../../store/actions';
+
+import { Store } from '@ngrx/store';
 // import * as storage from 'electron-json-storage';
 
 @Injectable({
@@ -17,7 +21,7 @@ export class ElectronService {
   fs: typeof fs;
   // jsonStorage: typeof storage;
 
-  constructor() {
+  constructor(private store: Store<AppConfig>) {
     // Conditional imports
     if (this.isElectron) {
       this.ipcRenderer = window.require('electron').ipcRenderer;
@@ -55,5 +59,11 @@ export class ElectronService {
 
   requestMinimize(): void {
     this.ipcRenderer.send('minimize-application');
+  }
+
+  loadConfig() : void {
+    this.ipcRenderer.invoke('load-config').then((config) => {
+      this.store.dispatch(appActions.loadConfig(config));
+    })
   }
 }

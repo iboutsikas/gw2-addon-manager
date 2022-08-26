@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ElectronService } from '../core/services';
 
 interface Locale {
   titleKey: string;
@@ -27,9 +28,10 @@ export class MenuBarComponent implements OnInit {
     return this.localesSubject.asObservable();
   }
 
-  constructor(private translateService: TranslateService) { 
-    
-
+  constructor(
+    private translateService: TranslateService,
+    private electronService: ElectronService
+    ) { 
     this.localesSubject = new BehaviorSubject<Locale[]>(this.locales);
   }
 
@@ -40,5 +42,4 @@ export class MenuBarComponent implements OnInit {
   onLanguageChange(languageCode:string): void {
     this.translateService.use(languageCode);
   }
-
 }

@@ -26,6 +26,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { APP_CONFIG as environment } from '../environments/environment';
 
+import {configReducer} from './store/reducers';
+
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -51,7 +53,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
         deps: [HttpClient]
       }
     }),
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ config: configReducer }, {}),
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],
