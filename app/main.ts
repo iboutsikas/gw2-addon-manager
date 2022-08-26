@@ -1,6 +1,7 @@
-import {app, BrowserWindow, shell} from 'electron';
+import {app, BrowserWindow, shell, ipcMain} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 let win: BrowserWindow = null;
@@ -67,7 +68,10 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('ready', () =>  {
+    storage.setDataPath(app.getPath('userData'));
+    setTimeout(createWindow, 400);
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -86,11 +90,19 @@ try {
     }
   });
 
-  app.whenReady().then(() => {
-    installExtension(REDUX_DEVTOOLS)
-      .then((name) => console.log(`Added Extension:  ${name}`))
-      .catch((err) => console.log('An error occurred: ', err));
+  ipcMain.on('close-application', (evt, arg) => {
+    app.quit();
   });
+
+  ipcMain.on('minimize-application', (evt, args) => {
+    win.minimize();
+  });
+
+  // app.whenReady().then(() => {
+  //   installExtension(REDUX_DEVTOOLS)
+  //     .then((name) => console.log(`Added Extension:  ${name}`))
+  //     .catch((err) => console.log('An error occurred: ', err));
+  // });
 
 } catch (e) {
   // Catch Error

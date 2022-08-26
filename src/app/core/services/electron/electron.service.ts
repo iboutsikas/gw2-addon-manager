@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+// import * as storage from 'electron-json-storage';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class ElectronService {
   webFrame: typeof webFrame;
   childProcess: typeof childProcess;
   fs: typeof fs;
+  // jsonStorage: typeof storage;
 
   constructor() {
     // Conditional imports
@@ -23,18 +25,11 @@ export class ElectronService {
 
       this.fs = window.require('fs');
 
+      
       this.childProcess = window.require('child_process');
-      this.childProcess.exec('node -v', (error, stdout, stderr) => {
-        if (error) {
-          console.error(`error: ${error.message}`);
-          return;
-        }
-        if (stderr) {
-          console.error(`stderr: ${stderr}`);
-          return;
-        }
-        console.log(`stdout:\n${stdout}`);
-      });
+      
+      // this.jsonStorage = window.require('electron-json-storage');
+      // console.log(this.jsonStorage.getDataPath());
 
       // Notes :
       // * A NodeJS's dependency imported with 'window.require' MUST BE present in `dependencies` of both `app/package.json`
@@ -52,5 +47,13 @@ export class ElectronService {
 
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);
+  }
+
+  requestClose(): void {
+    this.ipcRenderer.send('close-application');
+  }
+
+  requestMinimize(): void {
+    this.ipcRenderer.send('minimize-application');
   }
 }
