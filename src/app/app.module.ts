@@ -16,6 +16,7 @@ import { DetailModule } from './detail/detail.module';
 
 import { AppComponent } from './app.component';
 import { TitleBarComponent } from './title-bar/title-bar.component';
+import { MenuBarComponent } from './menu-bar/menu-bar.component';
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new TranslateHttpLoader(http, './assets/i18n/', '.json');
