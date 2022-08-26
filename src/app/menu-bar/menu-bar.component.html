@@ -1,1 +1,17 @@
-<p>menu-bar works!</p>
+<div id="menus-container">
+    <span>{{ 'COMPONENTS.MENU.OPTIONS' | translate }}</span>
+    <span>{{ 'COMPONENTS.MENU.LANGUAGE' | translate }}</span>
+</div>
+<div id="outside-links">
+    <a target="_blank" 
+    [title]="'COMPONENTS.MENU.WIKI_TOOLTIP' | translate"
+    href="https://github.com/fmmmlee/GW2-Addon-Manager/wiki">
+        WIKI
+    </a>
+    
+    <a target="_blank" 
+    [title]="'COMPONENTS.MENU.COMPANIONS_TOOLTIP' | translate"
+    href="https://github.com/fmmmlee/GW2-Addon-Manager/wiki/Other-Useful-Programs">
+        {{ 'COMPONENTS.MENU.COMPANIONS' | translate }}
+    </a>
+</div>

@@ -8,5 +8,14 @@
         "TITLE": "Detail page !",
         "BACK_TO_HOME": "Back to Home"
     }
+  },
+  "COMPONENTS": {
+    "MENU": {
+      "OPTIONS": "Options",
+      "LANGUAGE": "Language",
+      "COMPANIONS": "Companion Applications",
+      "WIKI_TOOLTIP": "Addon manager's WIKI",
+      "COMPANIONS_TOOLTIP": "Programs for GW2 not managed by GW2-UOAOM, such as TacO"
+    }
   }
 }
