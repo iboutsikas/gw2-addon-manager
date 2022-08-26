@@ -1,0 +1,47 @@
+:host {
+    background-color: transparent;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: var(--app-right-margin);
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+
+    button {
+        --font-size: 0.8rem;
+        margin: 0;
+        width: calc(4 * var(--font-size));
+        height:calc(2 * var(--font-size));
+        border: 0;
+        outline: 0;
+        background: transparent;
+        // we need this, otherwise the buttons do not receive mouse events
+        -webkit-app-region: no-drag; 
+
+        &:hover {
+            background: rgba(0,0,0,.1);
+        }
+
+        &#close-button:hover {
+            background: #e81123;
+
+            &> svg path,
+            &> svg rect,
+            &> svg polygon  {
+                fill: #fff;
+            }
+        }
+
+        & > svg {
+            width: var(--font-size);
+            height: var(--font-size);
+        }
+
+        &> svg path,
+        &> svg rect,
+        &> svg polygon  {
+            fill: #000;
+        }
+    }
+}
