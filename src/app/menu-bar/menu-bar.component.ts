@@ -37,15 +37,8 @@ export class MenuBarComponent implements OnInit {
     
   }
 
-  onLanguageChange(evt): void {
-    const index = evt.target.selectedIndex;
-    
-    // If the index is 0 they selected "Language" again
-    // so we don't need to do anything
-    if (index < 1)
-      return;
-
-    this.translateService.use(this.locales[index - 1].languageCode)
+  onLanguageChange(languageCode:string): void {
+    this.translateService.use(languageCode);
   }
 
 }

@@ -1,0 +1,71 @@
+@use '@angular/material' as mat;
+
+
+$blue-palette: (
+  50:  #E1F7FA,
+  100: #B4EBF2,
+  200: #85DEEB,
+  300: #57D1E2,
+  400: #3AC7DA,
+  500: #2CBDD4,
+  600: #29ADC1,
+  700: #2598a7,
+  800: #21848F,
+  900: #1A6064,  
+  contrast: (
+    50:  rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: rgba(black, 0.87),
+    700: rgba(black, 0.87),
+    800: rgba(black, 0.87),
+    900: white
+  )
+);
+
+$primary-palette: mat.define-palette($blue-palette, 600);
+
+$red-palette: (
+  50:  #FFECEE,
+  100: #FED0D2,
+  200: #ED9F9A,
+  300: #E27C73,
+  400: #EB6150,
+  500: #EE5635,
+  600: #E04D35,
+  700: #CE432F,
+  800: #C13D29,
+  900: #B1351E,  
+  contrast: (
+    50:  rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: rgba(black, 0.87),
+    700: white,
+    800: white,
+    900: white
+  )
+);
+
+$secondary-palette: mat.define-palette($red-palette, 800);
+
+$my-typography: mat.define-typography-config();
+
+$my-theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $secondary-palette
+  )
+));
+
+// Use the default configuration.
+@include mat.core();
+@include mat.core-theme($my-theme);
+@include mat.button-theme($my-theme);
+@include mat.menu-theme($my-theme);

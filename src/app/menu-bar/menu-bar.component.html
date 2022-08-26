@@ -1,14 +1,26 @@
 <div id="menus-container">
-    <span>{{ 'COMPONENTS.MENU.OPTIONS' | translate }}</span>
-    <select (change)="onLanguageChange($event)">
-        <option value="-1">{{ 'COMPONENTS.MENU.LANGUAGE' | translate }}</option>
-        <option *ngFor="let locale of locales$ | async" [value]="locale.value">
+    <button mat-button [matMenuTriggerFor]="optionsMenu">
+        {{ 'COMPONENTS.MENU.OPTIONS' | translate }}
+    </button>
+    <mat-menu #optionsMenu="matMenu" yPosition="below">
+        <button mat-menu-item>Create Shortcut</button>
+        <button mat-menu-item>Force Redownload</button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="languageMenu">
+        {{ 'COMPONENTS.MENU.LANGUAGE' | translate }}
+    </button>
+    <mat-menu #languageMenu="matMenu">
+        <button 
+            mat-menu-item 
+            (click)="onLanguageChange(locale.languageCode)"        
+            *ngFor="let locale of locales$ | async">
             {{ locale.titleKey | translate}}
-        </option>
-    </select>
+        </button>
+    </mat-menu>
 </div>
 <div id="outside-links">
-    <a target="_blank" 
+    <a target="_blank"
     [title]="'COMPONENTS.MENU.WIKI_TOOLTIP' | translate"
     href="https://github.com/fmmmlee/GW2-Addon-Manager/wiki">
         WIKI
