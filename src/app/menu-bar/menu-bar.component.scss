@@ -11,6 +11,16 @@
             padding: 2px 5px 5px 5px;
             color: var(--app-font-gray);
         }
+        select {
+            color: var(--app-font-gray);
+            border: none;
+            padding: 0;
+            margin-top: -2px;
+
+            option {
+                border-color: red;
+            }
+        }
     }
 
     #outside-links {

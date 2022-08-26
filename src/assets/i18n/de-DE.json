@@ -1,0 +1,28 @@
+{
+  "PAGES": {
+      "HOME": {
+          "TITLE": "App works !",
+          "GO_TO_DETAIL": "Go to Detail"
+      },
+      "DETAIL": {
+        "TITLE": "Detail page !",
+        "BACK_TO_HOME": "Back to Home"
+    }
+  },
+  "COMPONENTS": {
+    "MENU": {
+      "OPTIONS": "Optionen",
+      "LANGUAGE": "Sprache",
+      "COMPANIONS": "Begleitanwendungen",
+      "WIKI_TOOLTIP": "Addon manager's WIKI",
+      "COMPANIONS_TOOLTIP": "Programme für GW2, die nicht von GW2-UOAOM verwaltet werden, wie z. B. TacO"
+    }
+  },
+  "LANGUAGES": {
+    "ENGLISH": "Englisch",
+    "FRENCH": "Französisch",
+    "CHINESE": "Chinesisch",
+    "KOREAN": "Koreanisch",
+    "GERMAN": "Deutsch"
+  }
+}

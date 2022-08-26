@@ -17,5 +17,12 @@
       "WIKI_TOOLTIP": "Addon manager's WIKI",
       "COMPANIONS_TOOLTIP": "Programs for GW2 not managed by GW2-UOAOM, such as TacO"
     }
+  },
+  "LANGUAGES": {
+    "ENGLISH": "English",
+    "FRENCH": "French",
+    "CHINESE": "Chinese",
+    "KOREAN": "Korean",
+    "GERMAN": "German"
   }
 }

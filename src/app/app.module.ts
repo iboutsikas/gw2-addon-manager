@@ -33,6 +33,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
     DetailModule,
     AppRoutingModule,
     TranslateModule.forRoot({
+      defaultLanguage: 'en-US',
       loader: {
         provide: TranslateLoader,
         useFactory: httpLoaderFactory,

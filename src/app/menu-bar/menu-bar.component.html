@@ -1,6 +1,11 @@
 <div id="menus-container">
     <span>{{ 'COMPONENTS.MENU.OPTIONS' | translate }}</span>
-    <span>{{ 'COMPONENTS.MENU.LANGUAGE' | translate }}</span>
+    <select (change)="onLanguageChange($event)">
+        <option value="-1">{{ 'COMPONENTS.MENU.LANGUAGE' | translate }}</option>
+        <option *ngFor="let locale of locales$ | async" [value]="locale.value">
+            {{ locale.titleKey | translate}}
+        </option>
+    </select>
 </div>
 <div id="outside-links">
     <a target="_blank" 
