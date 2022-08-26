@@ -1,4 +1,4 @@
-import {app, BrowserWindow, screen} from 'electron';
+import {app, BrowserWindow, shell} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -51,6 +51,11 @@ function createWindow(): BrowserWindow {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null;
+  });
+
+  win.webContents.setWindowOpenHandler(({url}) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
   });
 
   return win;
