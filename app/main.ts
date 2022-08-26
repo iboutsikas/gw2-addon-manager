@@ -7,15 +7,18 @@ const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
 function createWindow(): BrowserWindow {
-
-  const size = screen.getPrimaryDisplay().workAreaSize;
+  const width = 1130;
+  const height = 600;
 
   // Create the browser window.
-  win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
+  win = new BrowserWindow({    
+    width: width,
+    height: height,
+    center: true,
+    resizable: false,
+    icon: path.join(__dirname, '../src/favicon.ico'),
+    transparent: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve),
