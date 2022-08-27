@@ -1,7 +1,7 @@
 {
-  "name": "angular-electron",
+  "name": "gw2-addon-manager",
   "version": "11.1.0",
-  "description": "Angular 14 with Electron 19 (Typescript + SASS + Hot Reload)",
+  "description": "AddOn manager for Guild Wars 2",
   "homepage": "https://github.com/maximegris/angular-electron",
   "author": {
     "name": "Maxime GRIS",

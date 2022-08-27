@@ -7,7 +7,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-electron": {
+    "gw2-addon-manager": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -113,27 +113,27 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "angular-electron:build"
+            "browserTarget": "gw2-addon-manager:build"
           },
           "configurations": {
             "dev": {
-              "browserTarget": "angular-electron:build:dev"
+              "browserTarget": "gw2-addon-manager:build:dev"
             },
             "production": {
-              "browserTarget": "angular-electron:build:production"
+              "browserTarget": "gw2-addon-manager:build:production"
             },
             "web": {
-              "browserTarget": "angular-electron:build:web"
+              "browserTarget": "gw2-addon-manager:build:web"
             },
             "web-production": {
-              "browserTarget": "angular-electron:build:web-production"
+              "browserTarget": "gw2-addon-manager:build:web-production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-electron:build"
+            "browserTarget": "gw2-addon-manager:build"
           }
         },
         "test": {
@@ -183,6 +183,5 @@
         }
       }
     }
-  },
-  "defaultProject": "angular-electron"
+  }
 }
