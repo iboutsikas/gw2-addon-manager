@@ -15,8 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { HomeModule } from './home/home.module';
-import { DetailModule } from './detail/detail.module';
+
 
 import { AppComponent } from './app.component';
 import { TitleBarComponent } from './title-bar/title-bar.component';
@@ -27,6 +26,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { APP_CONFIG as environment } from '../environments/environment';
 
 import {configReducer} from './store/reducers';
+import { AddonsModule } from './addons/addons.module';
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -42,8 +42,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
     MatButtonModule,
     CoreModule,
     SharedModule,
-    HomeModule,
-    DetailModule,
+    AddonsModule,
     AppRoutingModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en-US',
