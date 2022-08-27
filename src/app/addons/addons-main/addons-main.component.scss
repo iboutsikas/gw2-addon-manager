@@ -1,0 +1,31 @@
+:host {
+    background-color: rgba(255, 255, 255, 0.8);
+    display: block;
+    
+    .test-class {
+        max-height: 300px;
+    }
+
+    .mat-cell {
+        flex-shrink: 1;
+    }
+    
+    .mat-column-latestVersion {
+        justify-content: center;
+
+    }
+
+    .mat-column-actions {
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: 5%;
+        justify-content: center;
+    }
+
+    .actions-wrapper {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+
+}
