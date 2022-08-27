@@ -54,16 +54,35 @@ export class ElectronService {
   }
 
   requestClose(): void {
+    if (!this.isElectron)
+      return;
     this.ipcRenderer.send('close-application');
   }
 
   requestMinimize(): void {
+    if (!this.isElectron)
+      return;
     this.ipcRenderer.send('minimize-application');
   }
 
   loadConfig() : void {
+    if (!this.isElectron)
+      return;
+
     this.ipcRenderer.invoke('load-config').then((config) => {
-      this.store.dispatch(appActions.loadConfig(config));
+      this.store.dispatch(appActions.updateConfig(config));
+    })
+  }
+
+  saveConfig(config): void {
+    if (!this.isElectron)
+      return;
+
+    this.ipcRenderer.invoke('save-config', config).then(success => {
+      console.log('Settings saved!');
+    },
+    err => {
+      console.error('Failed to save settings', err);
     })
   }
 }

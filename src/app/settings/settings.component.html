@@ -1,0 +1,27 @@
+<form [formGroup]="settingsForm" (ngSubmit)="onSaveSettings()">
+    <h1 class="mat-display-1">
+        {{ 'GLOBALS.PREFERENCES' | translate }}
+    </h1>
+
+    <div class="form-group">
+        <label for="game-path">{{ 'GLOBALS.GAMEPATH' | translate }}</label>
+        <div class="form-control">
+            <input id="game-path" type="text" formControlName="gamePath"/>
+            <button class="settings-button">
+                <mat-icon>folder</mat-icon>
+                Browse
+            </button>
+        </div>
+        <div *ngIf="settingsForm.controls['gamePath'].invalid && (settingsForm.controls['gamePath'].dirty || settingsForm.controls['gamePath'].touched)" class="error-messages">
+            <span *ngIf="settingsForm.controls['gamePath'].errors.invalidPath">{{ 'COMPONENTS.SETTINGS.INVALID_PATH' | translate }}</span>
+            <span *ngIf="settingsForm.controls['gamePath'].errors.doesNotExist">{{ 'COMPONENTS.SETTINGS.MISSING_PATH' | translate }}</span>
+            <span *ngIf="settingsForm.controls['gamePath'].errors.noExe">{{ 'COMPONENTS.SETTINGS.MISSING_EXE' | translate }}</span>
+        </div>
+    </div>
+
+    <button class="settings-button" 
+    [disabled]="!settingsForm.valid"
+    type="submit">
+        {{ 'COMPONENTS.SETTINGS.SAVE' | translate}}
+    </button>
+</form>

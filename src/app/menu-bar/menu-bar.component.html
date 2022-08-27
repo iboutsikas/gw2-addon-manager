@@ -1,10 +1,10 @@
 <div id="menus-container">
     <button mat-button [matMenuTriggerFor]="optionsMenu">
-        {{ 'COMPONENTS.MENU.OPTIONS' | translate }}
+        {{ 'COMPONENTS.MENU.FILE' | translate }}
     </button>
     <mat-menu #optionsMenu="matMenu" yPosition="below">
-        <button mat-menu-item>Create Shortcut</button>
-        <button mat-menu-item>Force Redownload</button>
+        <button mat-menu-item routerLink="settings">{{ 'GLOBALS.PREFERENCES' | translate }}</button>
+        <button mat-menu-item>{{ 'COMPONENTS.MENU.REFRESH_ADDONS' | translate }}</button>
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="languageMenu">

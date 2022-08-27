@@ -9,5 +9,5 @@ const initialState: AppConfig = {
 
 export const configReducer = createReducer(
     initialState,
-    on(actions.loadConfig, (props, action) => props)
+    on(actions.updateConfig, (state, { type, ...props }) => ({...state, ...props }))
 )

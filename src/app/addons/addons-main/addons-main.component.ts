@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject, map, shareReplay } from 'rxjs';
+import { AddonService } from '../services/addon.service';
 import { AddonDescription } from '../store/state';
 
 @Component({
@@ -33,7 +34,7 @@ export class AddonsMainComponent implements OnInit {
 
   columnsToDisplay = ['name', 'actions', 'latestVersion', 'author'];
 
-  constructor() {
+  constructor(private addonService: AddonService) {
     this.addOnsSubject = new BehaviorSubject(this.addons);
 
     let shared = this.addOnsSubject
@@ -47,6 +48,7 @@ export class AddonsMainComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.addonService.refreshAddons();
   }
 
 }

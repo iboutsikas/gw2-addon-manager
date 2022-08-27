@@ -1,13 +1,16 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -27,19 +30,25 @@ import { APP_CONFIG as environment } from '../environments/environment';
 
 import {configReducer} from './store/reducers';
 import { AddonsModule } from './addons/addons.module';
+import { SettingsComponent } from './settings/settings.component';
+import { ConfigEffects } from './store/effects';
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 @NgModule({
-  declarations: [AppComponent, TitleBarComponent, MenuBarComponent],
+  declarations: [AppComponent, TitleBarComponent, MenuBarComponent, SettingsComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     MatMenuModule,
     MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
     CoreModule,
     SharedModule,
     AddonsModule,
@@ -53,7 +62,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
       }
     }),
     StoreModule.forRoot({ config: configReducer }, {}),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([ConfigEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],
   providers: [],

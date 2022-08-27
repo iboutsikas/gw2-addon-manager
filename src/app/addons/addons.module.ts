@@ -7,6 +7,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -15,7 +16,8 @@ import {MatButtonModule} from '@angular/material/button';
     AddonsMainComponent
   ],
   imports: [ 
-    CommonModule, 
+    CommonModule,
+    HttpClientModule,
     AddonsRoutingModule, 
     CoreModule, 
     MatTabsModule,

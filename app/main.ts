@@ -1,4 +1,4 @@
-import {app, BrowserWindow, shell, ipcMain} from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as storage from 'electron-json-storage';
@@ -13,7 +13,7 @@ function createWindow(): BrowserWindow {
   const height = 600;
 
   // Create the browser window.
-  win = new BrowserWindow({    
+  win = new BrowserWindow({
     width: width,
     height: height,
     center: true,
@@ -39,7 +39,7 @@ function createWindow(): BrowserWindow {
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
 
@@ -55,7 +55,7 @@ function createWindow(): BrowserWindow {
     win = null;
   });
 
-  win.webContents.setWindowOpenHandler(({url}) => {
+  win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
@@ -68,7 +68,7 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () =>  {
+  app.on('ready', () => {
     storage.setDataPath(app.getPath('userData'));
     setTimeout(createWindow, 400);
   });
@@ -99,24 +99,32 @@ try {
   });
 
   ipcMain.handle('load-config', async (event) => {
-    let config = storage.getSync('config');
-
-    if (Object.keys(config).length === 0) {
+    let config =  storage.getSync('config');
+    
+    const hasKeys = !!Object.keys(config).length;
+    if (!hasKeys) {
+      console.log('Initializing config for the first time');
       // First time running, let's initialize
       config = {
         gamePath: '',
         lastCheckedHash: ''
       }
 
-      storage.set('config', config, { prettyPrinting: true}, function(error) {
+      storage.set('config', config, { prettyPrinting: true }, function (error) {
         if (error) throw error;
       });
-
-      return config;
     }
+    
+    return config;
+  });
 
+  ipcMain.handle('save-config', async (event, config) => {
+    console.log('Saving settings', config);
+    storage.set('config', config, { prettyPrinting: true }, function (error) {
+      if (error) throw error;
+    })
 
-
+    return 1;
   });
 
   app.whenReady().then(() => {
