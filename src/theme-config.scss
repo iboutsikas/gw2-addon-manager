@@ -12,6 +12,7 @@ $blue-palette: (
   700: #2598a7,
   800: #21848F,
   900: #1A6064,  
+  text: rgb(105, 105, 105),
   contrast: (
     50:  rgba(black, 0.87),
     100: rgba(black, 0.87),
@@ -26,7 +27,7 @@ $blue-palette: (
   )
 );
 
-$primary-palette: mat.define-palette($blue-palette, 600);
+$primary-palette: mat.define-palette($blue-palette, 600, 300, text);
 
 $red-palette: (
   50:  #FFECEE,
@@ -55,17 +56,20 @@ $red-palette: (
 
 $secondary-palette: mat.define-palette($red-palette, 800);
 
-$my-typography: mat.define-typography-config();
+$my-typography: mat.define-typography-config(
+);
 
 $my-theme: mat.define-light-theme((
   color: (
     primary: $primary-palette,
     accent: $secondary-palette
-  )
+  ),
+  typography: $my-typography
 ));
 
 // Use the default configuration.
-@include mat.core();
+@include mat.core($my-theme);
 @include mat.core-theme($my-theme);
 @include mat.button-theme($my-theme);
 @include mat.menu-theme($my-theme);
+@include mat.all-component-typographies($my-theme);
