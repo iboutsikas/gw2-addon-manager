@@ -8,6 +8,8 @@ import { MatTableModule } from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
+import { StoreModule } from '@ngrx/store';
+import { addonsReducer } from './store/reducers';
 
 
 
@@ -23,7 +25,8 @@ import { HttpClientModule } from '@angular/common/http';
     MatTabsModule,
     MatTableModule,
     MatCheckboxModule,
-    MatButtonModule
+    MatButtonModule,
+    StoreModule.forFeature('addons', addonsReducer)
   ]
 })
 export class AddonsModule { }

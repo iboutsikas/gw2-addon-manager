@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 import { AppConfig } from '../../../store/state';
 import * as appActions from '../../../store/actions';
 
@@ -19,6 +20,7 @@ export class ElectronService {
   webFrame: typeof webFrame;
   childProcess: typeof childProcess;
   fs: typeof fs;
+  path: typeof path;
   // jsonStorage: typeof storage;
 
   constructor(private store: Store<AppConfig>) {
@@ -28,7 +30,7 @@ export class ElectronService {
       this.webFrame = window.require('electron').webFrame;
 
       this.fs = window.require('fs');
-
+      this.path = window.require('path');
       
       this.childProcess = window.require('child_process');
       
