@@ -21,6 +21,7 @@
     "SETTINGS": {
       "GAMEPATH_PLACEHOLDER": "GW2 installation path",
       "SAVE": "Save settings",
+      "BACK": "Back",
       "INVALID_PATH": "Game path is not valid",
       "MISSING_PATH": "Game path does not exist",
       "MISSING_EXE": "Could not find Gw2-64.exe. Are you sure this is the GW2 directory?"

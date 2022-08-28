@@ -19,9 +19,17 @@
         </div>
     </div>
 
-    <button class="settings-button" 
-    [disabled]="!settingsForm.valid"
-    type="submit">
-        {{ 'COMPONENTS.SETTINGS.SAVE' | translate}}
-    </button>
+    <div class="form-buttons">
+        <button routerLink="/" mat-stroked-button color="primary">
+            {{ 'COMPONENTS.SETTINGS.BACK' | translate}}
+        </button>
+        <button
+        mat-flat-button color="primary" 
+        [disabled]="!settingsForm.valid"
+        type="submit">
+            {{ 'COMPONENTS.SETTINGS.SAVE' | translate}}
+        </button>
+    </div>
+
+    
 </form>
