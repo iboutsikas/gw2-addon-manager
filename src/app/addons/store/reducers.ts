@@ -9,7 +9,7 @@ const initialState: AddonState = {
     loading: false
 };
 
-const mapToIdAsKey= (props: ReadonlyArray<AddonFromJSON>): any => {
+const mapToIdAsKey = (props: ReadonlyArray<AddonFromJSON>): any => {
     let result: any = {};
 
     Object.keys(props).forEach(key => {
@@ -22,25 +22,35 @@ const mapToIdAsKey= (props: ReadonlyArray<AddonFromJSON>): any => {
 
 export const addonsReducer = createReducer(
     initialState,
-    on(actions.updateAddonsInstalled, (state, { updates }) => {
-        return  { ...state, installedAddons: updates };
+    on(actions.addAddonsInstalled, (state, { updates }) => {
+        const addons = { ...state.installedAddons, ...updates };
+        return { ...state, installedAddons: addons };
     }),
-    on(actions.markAddonsEnabled, (state, { updates }) => {    
-        let newAddons = {... state.installedAddons };    
-        Object.keys(updates).forEach(key =>
-            newAddons[key].status = AddonStatus.ENABLED
-        );
-        return  { ...state,  installedAddons: newAddons };
+    on(actions.removeAddonsInstalled, (state, { updates }) => {
+        const addons = { ...state.installedAddons };
+
+        Object.keys(updates).forEach(key => {
+            delete (addons[key]);
+        });
+
+        return { ...state, installedAddons: addons };
     }),
-    on(actions.markAddonsDisabled, (state, { updates }) => {    
-        let newAddons = {... state.installedAddons };    
-        Object.keys(updates).forEach(key =>
-            newAddons[key].status = AddonStatus.DISABLED
-        );
-        return  { ...state,  installedAddons: newAddons };
+    on(actions.markAddonsEnabled, (state, { updates }) => {
+        let newAddons = { ...state.installedAddons };
+        Object.keys(updates).forEach(key => {
+            newAddons[key] = { ...newAddons[key], status: AddonStatus.ENABLED }
+        });
+        return { ...state, installedAddons: newAddons };
+    }),
+    on(actions.markAddonsDisabled, (state, { updates }) => {
+        let newAddons = { ...state.installedAddons };
+        Object.keys(updates).forEach(key => {
+            newAddons[key] = { ...newAddons[key], status: AddonStatus.DISABLED }
+        });
+        return { ...state, installedAddons: newAddons };
     }),
     on(actions.fetchAddonsSuccess, (state, { addons }) => {
         console.log(addons);
-        return { ... state, addons: addons };
+        return { ...state, addons: addons };
     })
 )

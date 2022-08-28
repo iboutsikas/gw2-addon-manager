@@ -20,10 +20,9 @@ export interface AddonDescription {
     latestVersion: string;
     authors: string[];
 
+    status?: AddonStatus
     installedVersion?: string;
     needsUpdate?: boolean;
-    installed?: boolean;
-    disabled?: boolean
 }
 export interface AddonState {
     addons: AddonDescription[];

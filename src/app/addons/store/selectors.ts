@@ -22,7 +22,7 @@ export const selectInstalledAddons = createSelector(
         addons.forEach(addon => {
             if (addon.id in info) {
                 const copy:AddonDescription = { ...addon };
-                copy.installed = true;
+                copy.status = info[addon.id].status;
                 copy.installedVersion = info[addon.id].version
                 copy.needsUpdate = copy.latestVersion > copy.installedVersion;
                 result.push(copy);

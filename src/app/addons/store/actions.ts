@@ -2,10 +2,16 @@ import { createAction, props } from '@ngrx/store';
 import { AddonDescription, AddonFromJSON, AddonHashMap } from './state';
 
 
-export const updateAddonsInstalled = createAction(
-    '[Addons] Update installed addons',
+export const addAddonsInstalled = createAction(
+    '[Addons] Add installed addons',
     props<{ updates: AddonHashMap }>()
 )
+
+export const removeAddonsInstalled = createAction(
+    '[Addons] Remove installed addons',
+    props<{ updates: AddonHashMap }>()
+)
+
 
 export const markAddonsEnabled = createAction(
     '[Addons] Mark addons enabled',

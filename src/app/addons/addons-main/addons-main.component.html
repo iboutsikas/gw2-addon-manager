@@ -11,8 +11,17 @@
                 <mat-cell *matCellDef="let addon"> 
                     <div class="actions-wrapper">
                         <button mat-flat-button color="accent" *ngIf="addon.needsUpdate">Update</button>
-                        <button mat-stroked-button color="primary">Disable</button>
-                        <button mat-stroked-button color="warn">Remove</button>
+                        <button mat-stroked-button color="primary"
+                        *ngIf="addon.status == addonStatus.ENABLED"
+                        (click)="onDisableClicked(addon)">
+                            Disable
+                        </button>
+                        <button mat-stroked-button color="primary"
+                        *ngIf="addon.status == addonStatus.DISABLED"
+                        (click)="onEnableClicked(addon)">
+                            Enable
+                        </button>
+                        <button mat-stroked-button color="warn" (click)="onUninstallClicked(addon)">Remove</button>
                     </div>
                 </mat-cell>
             </ng-container>
@@ -26,8 +35,10 @@
 
             <ng-container matColumnDef="author">
                 <mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    {{ addon.author }}
+                <mat-cell *matCellDef="let addon">
+                    <span *ngFor="let author of addon.autors">
+                        {{ author }}
+                    </span>
                 </mat-cell>
             </ng-container>
 
@@ -45,7 +56,7 @@
             <ng-container matColumnDef="actions">
                 <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
                 <mat-cell *matCellDef="let addon"> 
-                    <button mat-stroked-button color="primary">Install</button>
+                    <button mat-stroked-button color="primary" (click)="onInstallClicked(addon)">Install</button>
                 </mat-cell>
             </ng-container>
 
@@ -59,7 +70,9 @@
             <ng-container matColumnDef="author">
                 <mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
                 <mat-cell *matCellDef="let addon"> 
-                    {{ addon.author }}
+                    <span *ngFor="let author of addon.autors">
+                        {{ author }}
+                    </span>
                 </mat-cell>
             </ng-container>
 
