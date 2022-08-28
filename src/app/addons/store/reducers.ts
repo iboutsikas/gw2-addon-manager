@@ -1,12 +1,11 @@
 import { state } from '@angular/animations';
 import { createReducer, on } from '@ngrx/store';
 import * as actions from './actions';
-import { AddonFromJSON, AddonState } from './state';
+import { AddonFromJSON, AddonState, AddonStatus } from './state';
 
 const initialState: AddonState = {
     addons: [],
-    installedAddons: [],
-    disabledAddons: [],
+    installedAddons: {},
     loading: false
 };
 
@@ -23,14 +22,25 @@ const mapToIdAsKey= (props: ReadonlyArray<AddonFromJSON>): any => {
 
 export const addonsReducer = createReducer(
     initialState,
-    on(actions.updateAddonsInstalled, (state, {type, ...props}) => {
-        let mappedAddons: any = {};
-        
-
-        return  { ...state, installedAddons: mapToIdAsKey(props) };
+    on(actions.updateAddonsInstalled, (state, { updates }) => {
+        return  { ...state, installedAddons: updates };
     }),
-    on(actions.updateAddonsDisabled, (state, {type, ...props}) => {        
-        const flat: AddonFromJSON[] = Object.keys(props).map(key => props[key]);
-        return  { ...state, disabledAddons: mapToIdAsKey(props) };
+    on(actions.markAddonsEnabled, (state, { updates }) => {    
+        let newAddons = {... state.installedAddons };    
+        Object.keys(updates).forEach(key =>
+            newAddons[key].status = AddonStatus.ENABLED
+        );
+        return  { ...state,  installedAddons: newAddons };
+    }),
+    on(actions.markAddonsDisabled, (state, { updates }) => {    
+        let newAddons = {... state.installedAddons };    
+        Object.keys(updates).forEach(key =>
+            newAddons[key].status = AddonStatus.DISABLED
+        );
+        return  { ...state,  installedAddons: newAddons };
+    }),
+    on(actions.fetchAddonsSuccess, (state, { addons }) => {
+        console.log(addons);
+        return { ... state, addons: addons };
     })
 )

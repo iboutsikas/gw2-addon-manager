@@ -1,26 +1,32 @@
 export interface AddonHashMap {
-    [key: number] : AddonFromJSON
+    [key: string] : AddonFromJSON
 }
 
+export enum AddonStatus {
+    DISABLED,
+    ENABLED
+};
+
 export interface AddonFromJSON {
-    id: number;
+    id: string;
     name: string;
     version: string;
+    status: AddonStatus
 }
 
 export interface AddonDescription {
-    id: number;
+    id: string;
     name: string;
+    latestVersion: string;
+    authors: string[];
+
     installedVersion?: string;
-    latestVersion?: string;
-    author?: string;
-    needsUpdate: boolean;
-    installed: boolean;
+    needsUpdate?: boolean;
+    installed?: boolean;
     disabled?: boolean
 }
 export interface AddonState {
     addons: AddonDescription[];
-    installedAddons: AddonHashMap,
-    disabledAddons: AddonHashMap
+    installedAddons: AddonHashMap
     loading: boolean;
 }

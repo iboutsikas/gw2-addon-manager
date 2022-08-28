@@ -8,6 +8,8 @@ import { Store } from '@ngrx/store';
 import * as addonActions from '../store/actions';
 import { AddonFromJSON } from '../store/state';
 
+import { APP_CONFIG } from '../../../environments/environment'
+
 interface InstallationInformation {
   version: number;
   installedAddons: AddonFromJSON[];
@@ -26,27 +28,30 @@ export class AddonService {
     private es: ElectronService,
     private store: Store<AppState>
   ) {
-    let installationInfo$ = this.store.select(state => state.config.gamePath)
-      .pipe(
-        filter(path => path && path.trim() !== ''),
-        map(path => this.initializeInstallation(path)),
-        share()
-      );
+    // let installationInfo$ = this.store.select(state => state.config.gamePath)
+    //   .pipe(
+    //     filter(path => path && path.trim() !== ''),
+    //     map(path => this.initializeInstallation(path)),
+    //     share()
+    //   );
 
-    installationInfo$.pipe(
-      map(info => info.installedAddons),
-      filter(addons => addons.length != 0)
-    ).subscribe(installedAddons => {
-      this.store.dispatch(addonActions.updateAddonsInstalled(installedAddons))
-    });
+    // installationInfo$.pipe(
+    //   map(info => info.installedAddons),
+    //   filter(addons => addons.length != 0)
+    // ).subscribe(installedAddons => {
+    //   this.store.dispatch(addonActions.updateAddonsInstalled(installedAddons))
+    // });
 
-    installationInfo$.pipe(
-      map(info => info.disabledAddons),
-      filter(addons => addons.length != 0)
-    ).subscribe(disabledAddons => {
-      this.store.dispatch(addonActions.updateAddonsDisabled(disabledAddons))
-    });
+    // installationInfo$.pipe(
+    //   map(info => info.disabledAddons),
+    //   filter(addons => addons.length != 0)
+    // ).subscribe(disabledAddons => {
+    //   this.store.dispatch(addonActions.updateAddonsDisabled(disabledAddons))
+    // });
+  }
 
+  public fetchAllAddons() : void {
+    this.store.dispatch(addonActions.fetchAddons());
   }
 
   /**
@@ -92,11 +97,8 @@ export class AddonService {
     }
   }
 
-  public initializeInstallationFile() {
-
-  }
-
   public refreshAddons(): void {
+    return;
 
     /**
      * Quick description of how we are getting the data:
@@ -117,29 +119,29 @@ export class AddonService {
      * So in total this update will require 1 + 2N request, where N is the number of addons available.
      */
 
-    this.http.get<any>('https://api.github.com/repos/gw2-addon-loader/Approved-Addons/contents/')
-      .pipe(
-        tap(console.log),
-        map(list => list.filter(e => e.type == 'dir')),
-        map(list => list.map(e => e.name)),
-        map(names => names.map(name => `https://api.github.com/repos/gw2-addon-loader/Approved-Addons/contents/${name}/update-placeholder.yaml`)),
-        switchMap(links => {
-          const httpRequests = links.map(link =>
-            this.http.get(link).pipe(
-              map(json => json['download_url'])
-            )
-          );
-          return forkJoin(httpRequests);
-        }),
-        switchMap((links: any) => {
-          const httpRequests = links.map(link =>
-            this.http.get(link, { observe: 'body', responseType: 'text' }).pipe(
-              map(yamltxt => yamlLoad(yamltxt))
-            )
-          );
-          return forkJoin(httpRequests);
-        })
-      )
+    // this.http.get<any>('https://api.github.com/repos/gw2-addon-loader/Approved-Addons/contents/')
+    //   .pipe(
+    //     tap(console.log),
+    //     map(list => list.filter(e => e.type == 'dir')),
+    //     map(list => list.map(e => e.name)),
+    //     map(names => names.map(name => `https://api.github.com/repos/gw2-addon-loader/Approved-Addons/contents/${name}/update-placeholder.yaml`)),
+    //     switchMap(links => {
+    //       const httpRequests = links.map(link =>
+    //         this.http.get(link).pipe(
+    //           map(json => json['download_url'])
+    //         )
+    //       );
+    //       return forkJoin(httpRequests);
+    //     }),
+    //     switchMap((links: any) => {
+    //       const httpRequests = links.map(link =>
+    //         this.http.get(link, { observe: 'body', responseType: 'text' }).pipe(
+    //           map(yamltxt => yamlLoad(yamltxt))
+    //         )
+    //       );
+    //       return forkJoin(httpRequests);
+    //     })
+    //   )
     // .subscribe(thing => {
     //   console.log(thing);
     // })

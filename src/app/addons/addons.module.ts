@@ -10,6 +10,8 @@ import {MatButtonModule} from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { addonsReducer } from './store/reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { AddonEffects } from './store/effects';
 
 
 
@@ -26,7 +28,8 @@ import { addonsReducer } from './store/reducers';
     MatTableModule,
     MatCheckboxModule,
     MatButtonModule,
-    StoreModule.forFeature('addons', addonsReducer)
+    StoreModule.forFeature('addons', addonsReducer),
+    EffectsModule.forFeature([AddonEffects])
   ]
 })
 export class AddonsModule { }

@@ -9,11 +9,6 @@ export const selectInstalledAddonInfo = createSelector(
     (state: AddonState) => state.installedAddons
 );
 
-export const selectDisabledAddonInfo = createSelector(
-    selectAddons,
-    (state: AddonState) => state.disabledAddons
-);
-
 export const selectAllAddons = createSelector(
     selectAddons,
     (state: AddonState) => state.addons
@@ -37,10 +32,10 @@ export const selectInstalledAddons = createSelector(
     }
 )
 
-export const selectDisabledAddons = createSelector(
-    selectDisabledAddonInfo,
+export const selectAvailableAddons = createSelector(
+    selectInstalledAddonInfo,
     selectAllAddons,
     (info: AddonHashMap, addons: AddonDescription[]) => {
-        return addons.filter(a => !(a.id in info));
+        return addons.filter(a => !(a.id in info))
     }
 )
