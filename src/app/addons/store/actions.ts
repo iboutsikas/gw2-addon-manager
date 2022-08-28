@@ -12,14 +12,8 @@ export const removeAddonsInstalled = createAction(
     props<{ updates: AddonHashMap }>()
 )
 
-
-export const markAddonsEnabled = createAction(
-    '[Addons] Mark addons enabled',
-    props<{ updates: AddonHashMap }>()
-)
-
-export const markAddonsDisabled = createAction(
-    '[Addons] Mark addons disabled',
+export const updateAddonsStatus = createAction(
+    '[Addons] Update addons status',
     props<{ updates: AddonHashMap }>()
 )
 

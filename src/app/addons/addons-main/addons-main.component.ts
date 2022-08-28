@@ -53,13 +53,13 @@ export class AddonsMainComponent implements OnInit {
     const thing: AddonHashMap = { };
     thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: AddonStatus.DISABLED }
     
-    this.store.dispatch(addonActions.markAddonsDisabled({ updates: thing } ))
+    this.store.dispatch(addonActions.updateAddonsStatus({ updates: thing } ))
   }
 
   onEnableClicked(addon: AddonDescription): void {
     const thing: AddonHashMap = { };
     thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: AddonStatus.ENABLED }
     
-    this.store.dispatch(addonActions.markAddonsEnabled({ updates: thing } ))
+    this.store.dispatch(addonActions.updateAddonsStatus({ updates: thing } ))
   }
 }

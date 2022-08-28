@@ -35,17 +35,10 @@ export const addonsReducer = createReducer(
 
         return { ...state, installedAddons: addons };
     }),
-    on(actions.markAddonsEnabled, (state, { updates }) => {
+    on(actions.updateAddonsStatus, (state, { updates }) => {
         let newAddons = { ...state.installedAddons };
         Object.keys(updates).forEach(key => {
-            newAddons[key] = { ...newAddons[key], status: AddonStatus.ENABLED }
-        });
-        return { ...state, installedAddons: newAddons };
-    }),
-    on(actions.markAddonsDisabled, (state, { updates }) => {
-        let newAddons = { ...state.installedAddons };
-        Object.keys(updates).forEach(key => {
-            newAddons[key] = { ...newAddons[key], status: AddonStatus.DISABLED }
+            newAddons[key] = { ...newAddons[key], status: updates[key].status }
         });
         return { ...state, installedAddons: newAddons };
     }),
