@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { AddonService } from '../services/addon.service';
 import { AddonDescription, AddonHashMap, AddonStatus } from '../store/state';
@@ -27,7 +27,8 @@ export class AddonsMainComponent implements OnInit {
     private store: Store<AppState>
     
   ) {
-    this.installed$ = this.store.select(selectInstalledAddons);
+    this.installed$ = this.store.select(selectInstalledAddons)
+    // .pipe(tap(addons => console.log('Addons as seen from the main component', addons)));
     this.available$ = this.store.select(selectAvailableAddons);
   }
 

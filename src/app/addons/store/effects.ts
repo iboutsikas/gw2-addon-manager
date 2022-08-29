@@ -16,6 +16,23 @@ import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
 @Injectable()
 export class AddonEffects {
 
+    installationFile$ = createEffect(() => 
+        this.store.select(state => state.config.gamePath).pipe(
+            filter(path => path && path.trim() !== ''),
+            observeOn(leaveZone(this.zone, asyncScheduler)),
+            switchMap(path => this.addonService.initializeInstallation(path)),
+            observeOn(enterZone(this.zone, queueScheduler)),
+            map(info => info.addons),
+            map(addons => {
+                let hash = {}
+                for (let addon of addons) {
+                    hash[addon.id] = addon;
+                }
+                return hash;
+            }),
+            map(addons => addonActions.addAddonsInstalled({ updates: addons }))
+        ));
+
     // Typescript is losing it's mind over the types here, so we tell it to pipe down
     // @ts-ignore
     fetchAddons$ = createEffect(() => this.actions$.pipe(
@@ -26,10 +43,11 @@ export class AddonEffects {
         ))
     ));
 
+    // @ts-ignore
     updateStatus$ = createEffect(() => this.actions$.pipe(
         ofType(addonActions.updateAddonsStatus),
         map(action => action.updates),
-        bufferTime(5 * 1000),
+        bufferTime(1 * 1000),
         filter(changes => changes.length !== 0),
         map((changes: AddonHashMap[]) => {
             // The array of changes might have the same item multiple times. So we will ignore
@@ -37,7 +55,6 @@ export class AddonEffects {
             const consolidatedChanges = {};
 
             for (let change of changes) {
-                console.log(change);
                 Object.keys(change).forEach(key => {
                     if (!(key in consolidatedChanges))
                         consolidatedChanges[key] = change[key];
@@ -70,12 +87,15 @@ export class AddonEffects {
         observeOn(leaveZone(this.zone, asyncScheduler)),
         switchMap(changes => this.addonService.updateAddonsStatus(changes)),
         observeOn(enterZone(this.zone, queueScheduler)),
-        tap((thing) => {
-
-            console.log(thing);
-            console.log(`Are we in NgZone: ${NgZone.isInAngularZone()}`);
-        })
-    ), { dispatch: false });
+        map((changes: AddonHashMap) => {
+            let result = {};
+            Object.keys(changes).forEach(key => {
+                result[key] = { status: changes[key] }
+            })
+            return result;
+        }),
+        map(updates => addonActions.updateAddonsStatusEnd({ updates }))
+    ));
 
     constructor(
         private http: HttpClient,

@@ -17,6 +17,11 @@ export const updateAddonsStatus = createAction(
     props<{ updates: AddonHashMap }>()
 )
 
+export const updateAddonsStatusEnd = createAction(
+    '[Addons] Update addons status end',
+    props<{ updates: AddonHashMap }>()
+)
+
 export const fetchAddons = createAction(
     '[Addons] Fetch addons'
 )

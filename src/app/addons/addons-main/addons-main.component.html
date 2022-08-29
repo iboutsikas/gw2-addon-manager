@@ -8,8 +8,8 @@
 
             <ng-container matColumnDef="actions">
                 <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    <div class="actions-wrapper">
+                <mat-cell *matCellDef="let addon">
+                    <div class="actions-wrapper" *ngIf="!addon.beingProcessed; else addonProcessed">
                         <button mat-flat-button color="accent" *ngIf="addon.needsUpdate">Update</button>
                         <button mat-stroked-button color="primary"
                         *ngIf="addon.status == addonStatus.ENABLED"
@@ -23,6 +23,9 @@
                         </button>
                         <button mat-stroked-button color="warn" (click)="onUninstallClicked(addon)">Remove</button>
                     </div>
+                    <ng-template #addonProcessed>
+                        <span>Working on it...</span>
+                    </ng-template>
                 </mat-cell>
             </ng-container>
 

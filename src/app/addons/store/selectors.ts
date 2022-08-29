@@ -25,6 +25,7 @@ export const selectInstalledAddons = createSelector(
                 copy.status = info[addon.id].status;
                 copy.installedVersion = info[addon.id].version
                 copy.needsUpdate = copy.latestVersion > copy.installedVersion;
+                copy.beingProcessed = info[addon.id].beingProcessed;
                 result.push(copy);
             }
         })
