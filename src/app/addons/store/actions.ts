@@ -1,25 +1,25 @@
 import { createAction, props } from '@ngrx/store';
-import { AddonDescription, AddonFromJSON, AddonHashMap } from './state';
+import { Addon, HashMap, Loader, Manager } from '../addons.model';
 
 
-export const addAddonsInstalled = createAction(
+export const installAddons = createAction(
     '[Addons] Add installed addons',
-    props<{ updates: AddonHashMap }>()
+    props<{ addonsToInstall: HashMap<Addon> }>()
 )
 
 export const removeAddonsInstalled = createAction(
     '[Addons] Remove installed addons',
-    props<{ updates: AddonHashMap }>()
+    props<{ updates: HashMap<Addon> }>()
 )
 
 export const updateAddonsStatus = createAction(
     '[Addons] Update addons status',
-    props<{ updates: AddonHashMap }>()
+    props<{ updates: HashMap<Addon> }>()
 )
 
 export const updateAddonsStatusEnd = createAction(
     '[Addons] Update addons status end',
-    props<{ updates: AddonHashMap }>()
+    props<{ updates: HashMap<Addon> }>()
 )
 
 export const fetchAddons = createAction(
@@ -28,7 +28,7 @@ export const fetchAddons = createAction(
 
 export const fetchAddonsSuccess = createAction (
     '[Addons] Fetch addons success',
-    props<{ addons: AddonDescription[] }>()
+    props<{ addons?: HashMap<Addon>, loader?: Loader, manager?: Manager }>()
 )
 
 export const fetchAddonsFailure = createAction (

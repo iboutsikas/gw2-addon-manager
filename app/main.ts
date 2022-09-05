@@ -4,7 +4,9 @@ import * as fs from 'fs';
 import * as fsp from 'node:fs/promises';
 import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
-import { InstallationInfo } from './interfaces/addon-interfaces';
+import { AddonStatus, InstallationInfo } from './interfaces/addon-interfaces';
+import { handleInstallAddons, initializeInstallation } from './utils';
+import { AddonManagerConfig } from './interfaces/general-interfaces';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
@@ -65,28 +67,6 @@ function createWindow(): BrowserWindow {
   return win;
 }
 
-const createInstallationFilesAndDirectories = async (fileContents, gamePath) => {
-  // Make the installation file first
-  const installationFilePath = path.join(gamePath, 'gw2addonmanager');
-
-  const json = JSON.stringify(fileContents, null, 2);
-  await fsp.writeFile(installationFilePath, json);
-  console.log(`Wrote ${installationFilePath}`);
-
-  // Since this might be a completely new installation,
-  // let's also make a couple of directories we will need
-  const addonsDirectory = path.join(gamePath, 'addons');
-  const disabledAddonsDirectory = path.join(gamePath, 'disabled-addons');
-
-  if (!fs.existsSync(addonsDirectory)) {
-    fs.mkdirSync(addonsDirectory);
-  }
-
-  if (!fs.existsSync(disabledAddonsDirectory)) {
-    fs.mkdirSync(disabledAddonsDirectory);
-  }
-}
-
 try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
@@ -123,26 +103,26 @@ try {
   });
 
   ipcMain.handle('load-config', async (event) => {
-    let config =  storage.getSync('config');
-    
+    let config: AddonManagerConfig = storage.getSync('config');
+
     const hasKeys = !!Object.keys(config).length;
     if (!hasKeys) {
       console.log('Initializing config for the first time');
       // First time running, let's initialize
       config = {
         gamePath: '',
-        lastCheckedHash: ''
+        locale: 'en-US'
       }
 
       storage.set('config', config, { prettyPrinting: true }, function (error) {
         if (error) throw error;
       });
     }
-    
+
     return config;
   });
 
-  ipcMain.handle('save-config', async (event, config) => {
+  ipcMain.handle('save-config', async (event, config: AddonManagerConfig) => {
     console.log('Saving settings', config);
     storage.set('config', config, { prettyPrinting: true }, function (error) {
       if (error) throw error;
@@ -151,75 +131,9 @@ try {
     return 1;
   });
 
-  ipcMain.handle('initialize-installation', async (event, gamePath) => {
-    const installationFilePath = path.join(gamePath, 'gw2addonmanager');
+  ipcMain.handle('initialize-installation', async (event, gamePath) => await initializeInstallation(gamePath));
 
-    let installFile: InstallationInfo = {
-      version: 1,
-      addons: []
-    };
-
-    try {
-      const text = await fsp.readFile(installationFilePath, 'utf8');
-      installFile = JSON.parse(text);
-      console.log(`Found installation file at ${installationFilePath}`);
-    } catch(e) {
-      if (e.code !== 'ENOENT')
-        throw e;
-        console.log('This appears to be a new GW2 installation. Setting up files...');
-        await createInstallationFilesAndDirectories(installFile, gamePath);
-    } finally {
-      return installFile;
-    }
-
-  });
-
-  ipcMain.handle('update-addon-status', async (event, changes) => {
-    const config =  storage.getSync('config');
-    const gamePath = config.gamePath;
-
-
-    const result = {};
-
-    for (let change of changes) {
-      let sourcePath;
-      let destinationPath;
-
-      if (change.status == 0) {
-        sourcePath = path.join(gamePath, 'addons', change.internalName);
-        destinationPath = path.join(gamePath, 'disabled-addons', change.internalName);
-      }
-      else if (change.status == 1){
-        sourcePath = path.join(gamePath, 'disabled-addons', change.internalName);
-        destinationPath = path.join(gamePath, 'addons', change.internalName);
-      }
-      try {
-        console.log(`Copying ${sourcePath} to ${destinationPath}`);
-        await fsp.rename(sourcePath, destinationPath);
-        console.log('Copy done.')
-        result[change.id] = change.status;
-      } catch (e) {
-        console.log(`Copy failed: ${e.message}`);
-        // Reset the status change and send it back
-        result[change.id] = change.status == 0 ? 1 : 0;
-      }
-    }
-
-    // Update the installation file
-    const installationFilePath = path.join(gamePath, 'gw2addonmanager');
-    const text = await fsp.readFile(installationFilePath, 'utf8');
-    let installationInfo: InstallationInfo = JSON.parse(text);    
-    for(let addon of installationInfo.addons) {
-      if (addon.id in result) {
-        addon.status = result[addon.id];
-      }
-    }
-    
-    const json = JSON.stringify(installationInfo, null, 2);
-    await fsp.writeFile(installationFilePath, json);
-    
-    return result;
-  });
+  ipcMain.handle('install-addons', async (event, addons) => await handleInstallAddons(addons))
 
   app.whenReady().then(() => {
     installExtension(REDUX_DEVTOOLS)

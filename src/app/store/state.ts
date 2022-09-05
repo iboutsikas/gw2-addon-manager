@@ -2,7 +2,7 @@ import { AddonState } from "../addons/store/state";
 
 export interface AppConfig {
     gamePath?: string;
-    lastCheckedHash?: string;
+    locale?: string;
 }
 
 export interface AppState {

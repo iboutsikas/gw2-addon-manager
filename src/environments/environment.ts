@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
   production: false,
   environment: 'LOCAL',
-  apiBase: 'http://localhost:7000'
+  apiBase: 'http://localhost:5039'
 };

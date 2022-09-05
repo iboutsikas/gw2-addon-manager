@@ -5,26 +5,27 @@ import { ElectronService } from '../../core/services';
 import { AppState } from '../../store/state';
 import { Store } from '@ngrx/store';
 import * as addonActions from '../store/actions';
-import { AddonDescription, AddonFromJSON, AddonStatus } from '../store/state';
 
 import { APP_CONFIG } from '../../../environments/environment'
+import { Addon, InstallationInfo } from '../addons.model';
 
-interface InstallationInformation {
-  version: number;
-  installedAddons: AddonFromJSON[];
-}
+// interface InstallationInformation {
+//   version: number;
+//   installedAddons: AddonFromJSON[];
+// }
 
-export interface StatusUpdateReply {
-  succeeded: AddonDescription[];
-  failed: AddonDescription[];
-};
+// export interface StatusUpdateReply {
+//   succeeded: AddonDescription[];
+//   failed: AddonDescription[];
+// };
 
 @Injectable({
   providedIn: 'root'
 })
 export class AddonService {
-  private statusUpdatesSubject: Subject<StatusUpdateReply> = new Subject();
-  private installationSubject: Subject<any> = new Subject();
+  private statusUpdatesSubject: Subject<any> = new Subject();
+  private installationFileSubject: Subject<InstallationInfo> = new Subject();
+  private installAddonsSubject: Subject<any> = new Subject();
 
   constructor(
     private es: ElectronService,
@@ -37,19 +38,28 @@ export class AddonService {
     this.store.dispatch(addonActions.fetchAddons());
   }
 
-  public updateAddonsStatus(changes: AddonDescription[]): Observable<StatusUpdateReply> {
+  public installAddons(addons: Addon[]): Observable<any> {
+    this.es.ipcRenderer.invoke('install-addons', addons).then(result => {
+
+    });
+
+
+    return this.installAddonsSubject.asObservable();
+  }
+
+  public updateAddonsStatus(changes): Observable<any> {
     this.es.ipcRenderer.invoke('update-addon-status', changes).then(result => {
-      this.statusUpdatesSubject.next(result);
+      // this.statusUpdatesSubject.next(result);
     });
 
     return this.statusUpdatesSubject.asObservable();
   }
 
-  public initializeInstallation(path: string): Observable<any> {
+  public initializeInstallation(path: string): Observable<InstallationInfo> {
     this.es.ipcRenderer.invoke('initialize-installation', path).then(result => {
-      this.installationSubject.next(result);
+      this.installationFileSubject.next(result);
     });
 
-    return this.installationSubject.asObservable();
+    return this.installationFileSubject.asObservable();
   }
 }

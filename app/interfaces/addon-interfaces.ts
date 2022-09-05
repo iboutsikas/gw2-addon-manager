@@ -4,7 +4,6 @@ export enum AddonStatus {
 };
 
 export interface AddonJSON {
-    id: string;
     name: string;
     version: string;
     status: AddonStatus
@@ -12,5 +11,5 @@ export interface AddonJSON {
 
 export interface InstallationInfo {
     version: number;
-    addons: AddonJSON[];
+    addons: { [key: string] : AddonJSON };
 }

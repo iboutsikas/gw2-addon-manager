@@ -1,0 +1,218 @@
+import * as path from "path";
+import * as fs from 'fs-extra';
+import * as fsp from 'node:fs/promises';
+import * as storage from 'electron-json-storage';
+import * as download from 'download';
+import * as admzip from 'adm-zip'
+import * as log from 'electron-log';
+
+import { app } from 'electron';
+
+import { AddonStatus, InstallationInfo } from "./interfaces/addon-interfaces";
+import { Addon, HashMap } from "../src/app/addons/addons.model";
+import { AddonInstallationPaths, AddonManagerConfig } from "./interfaces/general-interfaces";
+import { PathLike } from "fs";
+
+const MAGIC_FILENAME = 'gw2addonmanager';
+
+const readInstallationFile = async () => {
+    const config = storage.getSync('config');
+    const filepath = path.join(config.gamePath, MAGIC_FILENAME);
+
+    const text = await fsp.readFile(filepath, 'utf8');
+    return JSON.parse(text);
+}
+
+export const initializeInstallation = async (gamePath) => {
+    // Check if we have the file
+    const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
+
+    let installFile: InstallationInfo = {
+        version: 1,
+        addons: {}
+    };
+
+    // If we do have the file we trust it
+    if (fs.existsSync(installationFilePath)) {
+        const text = await fsp.readFile(installationFilePath, 'utf8');
+        installFile = JSON.parse(text);
+        console.log(`Found installation file at ${installationFilePath}`);
+    }
+    // If we don't we create it and we check for existing addons
+    else {
+        // First check for existing addons so we can create the file
+        const addonsFolder = path.join(gamePath, 'addons');
+        const disabledAddonsFolder = path.join(gamePath, 'disabled-addons');
+        if (fs.existsSync(addonsFolder)) {
+            const filenames = await fsp.readdir(addonsFolder);
+            for (let name of filenames) {
+                console.log(`Found existing addon at ${name}`);
+                installFile.addons[name] = { name: name, version: '', status: AddonStatus.ENABLED };
+            }
+        }
+        else {
+            await fsp.mkdir(addonsFolder);
+        }
+
+        if (fs.existsSync(disabledAddonsFolder)) {
+            const filenames = await fsp.readdir(disabledAddonsFolder);
+            for (let name of filenames) {
+                console.log(`Found existing disabled addon at ${name}`);
+                installFile.addons[name] = { name: name, version: '', status: AddonStatus.DISABLED };
+            }
+        }
+        else {
+            await fsp.mkdir(disabledAddonsFolder);
+        }
+        const text = JSON.stringify(installFile, null, 2);
+        console.log(`Creating file at ${installationFilePath}`)
+        await fsp.writeFile(installationFilePath, text);
+    }
+
+    return installFile;
+}
+
+export const handleInstallAddons = async (addons: Addon[]) => {
+    const config = storage.getSync('config');
+
+    let installationInfo: InstallationInfo = await readInstallationFile();
+    const addonsFolder = path.join(config.gamePath, 'addons');
+
+
+    // let requirements = {};
+    // let conflicts = {}
+
+    // // First we need to gather up requirements
+    // for (let addon of addons) {
+    //     if (!addon.requires)
+    //         continue;
+
+    //     for (let requirement of addon.requires)
+    //         if (!(requirement in installationInfo.addons))
+    //             requirements[requirement] = 1;
+    // }
+
+    // // Next we check conflicts. If any addon has a conflict we won't install it
+    // for (let addon of addons) {
+    //     if (!addon.conflicts)
+    //         continue;
+
+    //     for (let c of addon.conflicts) {
+
+    //         // If the conflict is not an issue, we skip this addon
+    //         if (!(c in installationInfo.addons))
+    //             continue;
+
+    //         // Otherwise we need to record the conflict
+    //         if (!conflicts[c])
+    //             conflicts[c] = [];
+    //         conflicts[c].push(addon);
+    //     }
+    // }
+
+    const tmpPath = app.getPath("temp");
+
+    const succeded = [];
+    const failed = [];
+
+    for (let addon of addons) {
+
+        log.info(`Processing addon ${addon.addon_name}`);
+
+        try {
+            const downloadPath = path.join(tmpPath, addon.nickname);
+            await download(addon.download_url, downloadPath);
+            log.info(`Saved file at: ${downloadPath}`);
+
+            let paths: AddonInstallationPaths = {};
+
+            paths.download = downloadPath;
+            paths.addons = addonsFolder;
+            paths.tmp = tmpPath;
+            paths.installation = path.join(addonsFolder, addon.nickname);
+
+            if (addon.install_mode === 'binary') {
+                await installBinaryAddon(paths, addon);
+            }
+            else if (addon.install_mode === 'arc') {
+                await installArcPlugin(paths, addon);   
+            }
+
+            succeded.push(addon)
+
+        } catch (error) {
+            log.error(`Error processing ${addon.addon_name}: ${error.message}`);
+            failed.push({ addon: addon, reason: error.message });
+        }
+    }
+
+    
+
+
+}
+
+
+const installArcPlugin = async (paths:AddonInstallationPaths, addon: Addon) => {
+    const arcPath = path.join(paths['addons'], 'arcdps');
+
+    if (!fs.existsSync(arcPath)) {
+        throw new Error(`Trying to install arc plugin ${addon.addon_name}, but arc is not installed.`);
+    }
+
+    if (!addon.download_type) {
+        throw new Error(`Addon ${addon.addon_name} has no download type`);
+    }
+    
+    // All of these plugins need to be installed in the arcdps folder
+    paths.installation = path.join(paths.addons, 'arcdps');
+
+    return await installBinaryAddon(paths, addon);
+}
+
+const installBinaryAddon = async (paths:AddonInstallationPaths, addon: Addon) => {
+    if (!addon.download_type) {
+        throw new Error(`Addon ${addon.addon_name} has no download type`);
+    }
+
+    if (addon.download_type == 'dll') {
+        await fs.copy(paths['download'], paths.installation, { recursive: true });
+    }
+    else if (addon.download_type == 'archive') {
+
+        /**
+         * Once downloaded we will have a file in the following path:
+         * %TEMP%/<addon nickname>/<something>.zip
+         * Where <something> depends on the url, so we have to extract
+         * that part from the download url
+         */
+        const archiveName = path.basename(addon.download_url)
+
+        const zipPath = path.join(paths['download'], archiveName);
+        let zip = new admzip(zipPath);
+
+        const unzippedPath = `${paths['download']}_extracted`;
+        log.info(`Extracting ${zipPath} to ${unzippedPath}`);
+        await zip.extractAllTo(unzippedPath);
+
+        let sourcePath = ''
+        if (fs.existsSync(path.join(unzippedPath, addon.nickname))) {
+            /**
+             * The zip contains a folder with the contents of the addon, so for example:
+             *  gw2radial/
+             *    - gw2radial.dll
+             * so we need to copy the contents of that folder to the addons folder
+             */ 
+            sourcePath = path.join(unzippedPath, addon.nickname);
+        }
+        else {
+            /**
+             * The archive contains just the contents of the addon, so we copy from
+             * the extracted folder directly
+             */
+            sourcePath = unzippedPath
+        }
+
+        log.info(`Copying ${sourcePath} to ${paths.installation}`)
+        await fs.copy(sourcePath, paths.installation, { recursive: true });
+    }
+}

@@ -1,42 +1,41 @@
 import { createSelector } from "@ngrx/store";
+import { tap } from "rxjs";
 import { AppState } from "../../store/state";
-import { AddonDescription, AddonFromJSON, AddonHashMap, AddonState } from "./state";
 
-export const selectAddons = (state: AppState) => state.addons;
+export const selectAddonsFeature = (state: AppState) => state.addons;
 
-export const selectInstalledAddonInfo = createSelector(
-    selectAddons,
-    (state: AddonState) => state.installedAddons
-);
+export const selectLoader = createSelector(
+    selectAddonsFeature,
+    (feature) => feature.loader
+)
 
 export const selectAllAddons = createSelector(
-    selectAddons,
-    (state: AddonState) => state.addons
+    selectAddonsFeature,
+    (feature) => feature.addons
+);
+
+export const selectInstalledInfo = createSelector(
+    selectAddonsFeature,
+    (feature) => feature.installed
 )
 
 export const selectInstalledAddons = createSelector(
-    selectInstalledAddonInfo,
     selectAllAddons,
-    (info: AddonHashMap, addons: AddonDescription[]) => {
-        let result = []
-        addons.forEach(addon => {
-            if (addon.id in info) {
-                const copy:AddonDescription = { ...addon };
-                copy.status = info[addon.id].status;
-                copy.installedVersion = info[addon.id].version
-                copy.needsUpdate = copy.latestVersion > copy.installedVersion;
-                copy.beingProcessed = info[addon.id].beingProcessed;
-                result.push(copy);
-            }
-        })
-        return result;
+    selectInstalledInfo,
+    (addons, info) => {
+        return Object.keys(info).map(key => addons[key]);
     }
 )
 
 export const selectAvailableAddons = createSelector(
-    selectInstalledAddonInfo,
     selectAllAddons,
-    (info: AddonHashMap, addons: AddonDescription[]) => {
-        return addons.filter(a => !(a.id in info))
+    selectInstalledInfo,
+    (addons, info) => {
+        let result = [];
+        Object.keys(addons).forEach(key => {
+            if (!(key in info))
+                result.push(addons[key]);
+        });
+        return result
     }
 )

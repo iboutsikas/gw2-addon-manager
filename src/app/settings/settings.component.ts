@@ -51,6 +51,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const filepath = this.settingsForm.controls['gamePath'].value;
     console.log(filepath);
     this.store.dispatch(configActions.updateConfig({ gamePath: filepath}));
-    this.store.dispatch(configActions.storeConfig({}))
+    this.store.dispatch(configActions.storeConfig())
   }
 }
