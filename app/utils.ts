@@ -8,7 +8,7 @@ import * as log from 'electron-log';
 
 import { app } from 'electron';
 
-import { AddonStatus, InstallationInfo } from "./interfaces/addon-interfaces";
+import { AddonJSON, AddonStatus, InstallationInfo } from "./interfaces/addon-interfaces";
 import { Addon, HashMap } from "../src/app/addons/addons.model";
 import { AddonInstallationPaths, AddonManagerConfig } from "./interfaces/general-interfaces";
 import { PathLike } from "fs";
@@ -75,40 +75,7 @@ export const initializeInstallation = async (gamePath) => {
 export const handleInstallAddons = async (addons: Addon[]) => {
     const config = storage.getSync('config');
 
-    let installationInfo: InstallationInfo = await readInstallationFile();
     const addonsFolder = path.join(config.gamePath, 'addons');
-
-
-    // let requirements = {};
-    // let conflicts = {}
-
-    // // First we need to gather up requirements
-    // for (let addon of addons) {
-    //     if (!addon.requires)
-    //         continue;
-
-    //     for (let requirement of addon.requires)
-    //         if (!(requirement in installationInfo.addons))
-    //             requirements[requirement] = 1;
-    // }
-
-    // // Next we check conflicts. If any addon has a conflict we won't install it
-    // for (let addon of addons) {
-    //     if (!addon.conflicts)
-    //         continue;
-
-    //     for (let c of addon.conflicts) {
-
-    //         // If the conflict is not an issue, we skip this addon
-    //         if (!(c in installationInfo.addons))
-    //             continue;
-
-    //         // Otherwise we need to record the conflict
-    //         if (!conflicts[c])
-    //             conflicts[c] = [];
-    //         conflicts[c].push(addon);
-    //     }
-    // }
 
     const tmpPath = app.getPath("temp");
 
@@ -146,9 +113,24 @@ export const handleInstallAddons = async (addons: Addon[]) => {
         }
     }
 
-    
 
 
+
+}
+
+const updateInstallationFile = async (succeeded: Addon[]) => {
+    let installationInfo: InstallationInfo = await readInstallationFile();
+
+    for(let addon of succeeded) {
+        const a: AddonJSON = {
+            name: addon.nickname,
+            status: AddonStatus.ENABLED,
+            version: addon.version_id_is_human_readable ?  addon.version_id  : addon.version_id.substring(0, 8);
+        };
+        installationInfo.addons[addon.nickname] = a;
+    }
+
+    const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
 }
 
 
