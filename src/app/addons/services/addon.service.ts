@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import * as addonActions from '../store/actions';
 
 import { APP_CONFIG } from '../../../environments/environment'
-import { Addon, InstallationInfo } from '../addons.model';
+import { Addon, InstallationInfo } from '@gw2-am/common';
 
 // interface InstallationInformation {
 //   version: number;

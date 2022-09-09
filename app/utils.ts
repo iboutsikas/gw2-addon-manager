@@ -9,9 +9,10 @@ import * as log from 'electron-log';
 import { app } from 'electron';
 
 import { AddonJSON, AddonStatus, InstallationInfo } from "./interfaces/addon-interfaces";
-import { Addon, HashMap } from "../src/app/addons/addons.model";
-import { AddonInstallationPaths, AddonManagerConfig } from "./interfaces/general-interfaces";
-import { PathLike } from "fs";
+
+
+import { AddonInstallationPaths } from "./interfaces/general-interfaces";
+import { Addon } from "@gw2-am/common";
 
 const MAGIC_FILENAME = 'gw2addonmanager';
 
@@ -125,12 +126,12 @@ const updateInstallationFile = async (succeeded: Addon[]) => {
         const a: AddonJSON = {
             name: addon.nickname,
             status: AddonStatus.ENABLED,
-            version: addon.version_id_is_human_readable ?  addon.version_id  : addon.version_id.substring(0, 8);
+            version: addon.version_id_is_human_readable ?  addon.version_id  : addon.version_id.substring(0, 8)
         };
         installationInfo.addons[addon.nickname] = a;
     }
 
-    const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
+    // const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
 }
 
 

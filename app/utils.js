@@ -73,34 +73,10 @@ const initializeInstallation = (gamePath) => __awaiter(void 0, void 0, void 0, f
 exports.initializeInstallation = initializeInstallation;
 const handleInstallAddons = (addons) => __awaiter(void 0, void 0, void 0, function* () {
     const config = storage.getSync('config');
-    let installationInfo = yield readInstallationFile();
     const addonsFolder = path.join(config.gamePath, 'addons');
-    let requirements = {};
-    let conflicts = {};
-    // First we need to gather up requirements
-    for (let addon of addons) {
-        if (!addon.requires)
-            continue;
-        for (let requirement of addon.requires)
-            if (!(requirement in installationInfo.addons))
-                requirements[requirement] = 1;
-    }
-    // Next we check conflicts. If any addon has a conflict we won't install it
-    for (let addon of addons) {
-        if (!addon.conflicts)
-            continue;
-        for (let c of addon.conflicts) {
-            // If the conflict is not an issue, we skip this addon
-            if (!(c in installationInfo.addons))
-                continue;
-            // Otherwise we need to record the conflict
-            if (!conflicts[c])
-                conflicts[c] = [];
-            conflicts[c].push(addon);
-        }
-    }
     const tmpPath = electron_1.app.getPath("temp");
     const succeded = [];
+    const failed = [];
     for (let addon of addons) {
         log.info(`Processing addon ${addon.addon_name}`);
         try {
@@ -118,13 +94,27 @@ const handleInstallAddons = (addons) => __awaiter(void 0, void 0, void 0, functi
             else if (addon.install_mode === 'arc') {
                 yield installArcPlugin(paths, addon);
             }
+            succeded.push(addon);
         }
         catch (error) {
             log.error(`Error processing ${addon.addon_name}: ${error.message}`);
+            failed.push({ addon: addon, reason: error.message });
         }
     }
 });
 exports.handleInstallAddons = handleInstallAddons;
+const updateInstallationFile = (succeeded) => __awaiter(void 0, void 0, void 0, function* () {
+    let installationInfo = yield readInstallationFile();
+    for (let addon of succeeded) {
+        const a = {
+            name: addon.nickname,
+            status: addon_interfaces_1.AddonStatus.ENABLED,
+            version: addon.version_id_is_human_readable ? addon.version_id : addon.version_id.substring(0, 8)
+        };
+        installationInfo.addons[addon.nickname] = a;
+    }
+    // const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
+});
 const installArcPlugin = (paths, addon) => __awaiter(void 0, void 0, void 0, function* () {
     const arcPath = path.join(paths['addons'], 'arcdps');
     if (!fs.existsSync(arcPath)) {

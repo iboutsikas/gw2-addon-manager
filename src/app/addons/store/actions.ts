@@ -1,25 +1,26 @@
+import { Addon,Loader } from '@gw2-am/common';
 import { createAction, props } from '@ngrx/store';
-import { Addon, HashMap, Loader, Manager } from '../addons.model';
+import { Manager } from '../addons.model';
 
 
 export const installAddons = createAction(
     '[Addons] Add installed addons',
-    props<{ addonsToInstall: HashMap<Addon> }>()
+    props<{ addonsToInstall: Map<string, Addon> }>()
 )
 
 export const removeAddonsInstalled = createAction(
     '[Addons] Remove installed addons',
-    props<{ updates: HashMap<Addon> }>()
+    props<{ updates: Map<string, Addon> }>()
 )
 
 export const updateAddonsStatus = createAction(
     '[Addons] Update addons status',
-    props<{ updates: HashMap<Addon> }>()
+    props<{ updates: Map<string, Addon> }>()
 )
 
 export const updateAddonsStatusEnd = createAction(
     '[Addons] Update addons status end',
-    props<{ updates: HashMap<Addon> }>()
+    props<{ updates: Map<string, Addon> }>()
 )
 
 export const fetchAddons = createAction(
@@ -28,7 +29,7 @@ export const fetchAddons = createAction(
 
 export const fetchAddonsSuccess = createAction (
     '[Addons] Fetch addons success',
-    props<{ addons?: HashMap<Addon>, loader?: Loader, manager?: Manager }>()
+    props<{ addons?: Map<string, Addon>, loader?: Loader, manager?: Manager }>()
 )
 
 export const fetchAddonsFailure = createAction (

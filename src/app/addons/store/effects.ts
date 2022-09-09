@@ -11,7 +11,8 @@ import * as addonActions from './actions'
 import { APP_CONFIG } from '../../../environments/environment'
 import { AddonService } from "../services/addon.service";
 import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
-import { Addon, APIResponse, HashMap } from "../addons.model";
+import { APIResponse } from "../addons.model";
+import { Addon } from "@gw2-am/common";
 
 
 @Injectable()
@@ -55,7 +56,7 @@ export class AddonEffects {
         map(action => action.addonsToInstall),
         bufferTime(1 * 1000),
         filter(installations => installations.length !== 0),
-        map((installations: HashMap<Addon>[]) => {
+        map((installations: Map<string, Addon>[]) => {
             // Here we want to combine all of the hash maps
             // into a single hash map. This will remove all duplicates
             let result = {};

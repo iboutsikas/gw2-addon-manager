@@ -6,7 +6,8 @@ import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import { AddonStatus, InstallationInfo } from './interfaces/addon-interfaces';
 import { handleInstallAddons, initializeInstallation } from './utils';
-import { AddonManagerConfig } from './interfaces/general-interfaces';
+import { AddonManagerConfig } from '@gw2-am/common';
+
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),

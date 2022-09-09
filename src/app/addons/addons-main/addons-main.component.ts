@@ -6,7 +6,7 @@ import { AddonService } from '../services/addon.service';
 import { selectAvailableAddons, selectInstalledAddons } from '../store/selectors';
 import { AppState } from '../../store/state';
 import * as addonActions from '../store/actions';
-import { Addon, HashMap } from '../addons.model';
+import { Addon } from '@gw2-am/common';
 
 @Component({
   selector: 'app-addons-main',
@@ -40,7 +40,7 @@ export class AddonsMainComponent implements OnInit {
 
   onInstallClicked(addon: Addon): void {
 
-    const payload: HashMap<Addon> = {};
+    const payload: Map<string, Addon> = new Map<string, Addon>();
 
     payload[addon.nickname] = addon;
     this.store.dispatch(addonActions.installAddons({ addonsToInstall: payload }));

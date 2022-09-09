@@ -3,9 +3,11 @@ import { createReducer, on } from '@ngrx/store';
 import * as actions from './actions';
 import { AddonState } from './state';
 
+import { Addon, InstalledAddonMetadata } from '@gw2-am/common';
+
 const initialState: AddonState = {
-    addons: {},
-    installed: {}
+    addons: new Map<string, Addon>(),
+    installed: new Map<string, InstalledAddonMetadata>()
 };
 
 // const mapToIdAsKey = (props: ReadonlyArray<AddonFromJSON>): any => {
