@@ -17,11 +17,11 @@
       "dom"
     ],
     "paths": {
-      "@gw2-am/*": [ "./common" ]
+      "@gw2-am/*" : [ "../*"]
     }
   },
   "files": [
-    "app/main.ts"
+    "main.ts"
   ],
   "exclude": [
     "node_modules",

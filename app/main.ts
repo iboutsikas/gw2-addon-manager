@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as fsp from 'node:fs/promises';
 import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
-import { AddonStatus, InstallationInfo } from './interfaces/addon-interfaces';
+
 import { handleInstallAddons, initializeInstallation } from './utils';
-import { AddonManagerConfig } from '@gw2-am/common';
+import { AddonManagerConfig } from '../common';
 
 
 let win: BrowserWindow = null;

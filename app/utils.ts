@@ -8,11 +8,10 @@ import * as log from 'electron-log';
 
 import { app } from 'electron';
 
-import { AddonJSON, AddonStatus, InstallationInfo } from "./interfaces/addon-interfaces";
-
 
 import { AddonInstallationPaths } from "./interfaces/general-interfaces";
-import { Addon } from "@gw2-am/common";
+import { AddonInstaller } from "./addons/addonInstaller";
+import { InstallationInfo, InstalledAddonMetadata, AddonStatus, Addon } from "../common";
 
 const MAGIC_FILENAME = 'gw2addonmanager';
 
@@ -30,7 +29,7 @@ export const initializeInstallation = async (gamePath) => {
 
     let installFile: InstallationInfo = {
         version: 1,
-        addons: {}
+        addons: new Map<string, InstalledAddonMetadata>()
     };
 
     // If we do have the file we trust it
@@ -76,12 +75,10 @@ export const initializeInstallation = async (gamePath) => {
 export const handleInstallAddons = async (addons: Addon[]) => {
     const config = storage.getSync('config');
 
-    const addonsFolder = path.join(config.gamePath, 'addons');
-
     const tmpPath = app.getPath("temp");
+    const installer = new AddonInstaller(config.gamePath);
 
-    const succeded = [];
-    const failed = [];
+
 
     for (let addon of addons) {
 
@@ -95,35 +92,21 @@ export const handleInstallAddons = async (addons: Addon[]) => {
             let paths: AddonInstallationPaths = {};
 
             paths.download = downloadPath;
-            paths.addons = addonsFolder;
             paths.tmp = tmpPath;
-            paths.installation = path.join(addonsFolder, addon.nickname);
 
-            if (addon.install_mode === 'binary') {
-                await installBinaryAddon(paths, addon);
-            }
-            else if (addon.install_mode === 'arc') {
-                await installArcPlugin(paths, addon);   
-            }
-
-            succeded.push(addon)
+            await installer.installAddon(addon, paths);
 
         } catch (error) {
             log.error(`Error processing ${addon.addon_name}: ${error.message}`);
-            failed.push({ addon: addon, reason: error.message });
         }
     }
-
-
-
-
 }
 
 const updateInstallationFile = async (succeeded: Addon[]) => {
     let installationInfo: InstallationInfo = await readInstallationFile();
 
     for(let addon of succeeded) {
-        const a: AddonJSON = {
+        const a: InstalledAddonMetadata = {
             name: addon.nickname,
             status: AddonStatus.ENABLED,
             version: addon.version_id_is_human_readable ?  addon.version_id  : addon.version_id.substring(0, 8)
