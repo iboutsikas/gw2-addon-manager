@@ -10,12 +10,18 @@ import { AppConfig } from '../../../store/state';
 import * as appActions from '../../../store/actions';
 
 import { Store } from '@ngrx/store';
+import { Observable, Subject } from 'rxjs';
+import { IPCMessages } from '../../../../../common/ipcMessages';
+import { InitializationRequirements } from '../../../../../common/shared-interfaces';
 // import * as storage from 'electron-json-storage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ElectronService {
+
+  private initializeSubject$: Subject<InitializationRequirements> = new Subject();
+
   ipcRenderer: typeof ipcRenderer;
   webFrame: typeof webFrame;
   childProcess: typeof childProcess;
@@ -87,4 +93,15 @@ export class ElectronService {
       console.error('Failed to save settings', err);
     })
   }
+
+  checkRequiresInitialization(): Observable<InitializationRequirements> {
+
+    this.ipcRenderer.invoke(IPCMessages.CHECK_INITIALIZATION).then(
+      result => this.initializeSubject$.next(result),
+      err => this.initializeSubject$.error(err)
+    );
+
+    return this.initializeSubject$.asObservable();
+  }
+
 }

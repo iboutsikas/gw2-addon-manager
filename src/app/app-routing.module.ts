@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { AddonsRoutingModule } from './addons/addons-routing.module';
+import { LoadingPageComponent } from './loading-page/loading-page.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    component: LoadingPageComponent,
     pathMatch: 'full'
   },
   {

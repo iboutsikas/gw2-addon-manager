@@ -9,9 +9,15 @@ export interface InstalledAddonMetadata {
     status: AddonStatus
 }
 
+export interface LoaderMetaData {
+    installed: Boolean;
+    version: string;
+}
+
 export interface InstallationInfo {
     version: number;
     addons: Map<string, InstalledAddonMetadata>;
+    loader?: LoaderMetaData;
 }
 
 export interface Addon {

@@ -1,2 +1,4 @@
-export {Addon, AddonStatus, InstallationInfo, InstalledAddonMetadata} from './addons/addon-interfaces'
+export * from './addons/addon-interfaces'
 export * from './shared-interfaces'
+
+export * from './ipcMessages';

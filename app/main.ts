@@ -7,6 +7,9 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 import { handleInstallAddons, initializeInstallation } from './utils';
 import { AddonManagerConfig } from '../common';
+import { IPCMessages } from '../common';
+
+import { Instance as manager }  from './addon-manager/addonManager';
 
 
 let win: BrowserWindow = null;
@@ -95,42 +98,28 @@ try {
     }
   });
 
-  ipcMain.on('close-application', (evt, arg) => {
+  ipcMain.on(IPCMessages.CLOSE_APPLICATION, (evt, arg) => {
     app.quit();
   });
 
-  ipcMain.on('minimize-application', (evt, args) => {
+  ipcMain.on(IPCMessages.MINIMIZE_APPLICATION, (evt, args) => {
     win.minimize();
   });
 
-  ipcMain.handle('load-config', async (event) => {
-    let config: AddonManagerConfig = storage.getSync('config');
-
-    const hasKeys = !!Object.keys(config).length;
-    if (!hasKeys) {
-      console.log('Initializing config for the first time');
-      // First time running, let's initialize
-      config = {
-        gamePath: '',
-        locale: 'en-US'
-      }
-
-      storage.set('config', config, { prettyPrinting: true }, function (error) {
-        if (error) throw error;
-      });
-    }
-
+  ipcMain.handle(IPCMessages.LOAD_CONFIG, async (event) => {
+    const config = await manager.getConfig();
     return config;
   });
 
-  ipcMain.handle('save-config', async (event, config: AddonManagerConfig) => {
+  ipcMain.handle(IPCMessages.SAVE_CONFIG, async (event, config: AddonManagerConfig) => {
     console.log('Saving settings', config);
-    storage.set('config', config, { prettyPrinting: true }, function (error) {
-      if (error) throw error;
-    })
-
-    return 1;
+    
+    return await manager.saveConfig(config);
   });
+
+  ipcMain.handle(IPCMessages.CHECK_INITIALIZATION, async(event) => {
+    return await manager.requiresInitialization();
+  })
 
   ipcMain.handle('initialize-installation', async (event, gamePath) => await initializeInstallation(gamePath));
 

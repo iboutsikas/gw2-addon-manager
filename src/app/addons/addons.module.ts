@@ -12,12 +12,14 @@ import { StoreModule } from '@ngrx/store';
 import { addonsReducer } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { AddonEffects } from './store/effects';
+import { AddonManagerInitializerComponent } from './addon-manager-initializer/addon-manager-initializer.component';
 
 
 
 @NgModule({
   declarations: [
-    AddonsMainComponent
+    AddonsMainComponent,
+    AddonManagerInitializerComponent
   ],
   imports: [ 
     CommonModule,

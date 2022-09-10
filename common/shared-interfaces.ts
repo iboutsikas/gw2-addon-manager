@@ -1,3 +1,9 @@
+export interface InitializationRequirements {
+    settings: Boolean,
+    magicFile: Boolean,
+    loader: Boolean
+}
+
 export interface AddonManagerConfig {
     gamePath: string;
     locale: string;

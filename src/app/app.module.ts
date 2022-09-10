@@ -8,9 +8,10 @@ import { SharedModule } from './shared/shared.module';
 
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -28,16 +29,17 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { APP_CONFIG as environment } from '../environments/environment';
 
-import {configReducer} from './store/reducers';
+import { configReducer } from './store/reducers';
 import { AddonsModule } from './addons/addons.module';
 import { SettingsComponent } from './settings/settings.component';
 import { ConfigEffects } from './store/effects';
+import { LoadingPageComponent } from './loading-page/loading-page.component';
 
 // AoT requires an exported function for factories
-const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new TranslateHttpLoader(http, './assets/i18n/', '.json');
+const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 @NgModule({
-  declarations: [AppComponent, TitleBarComponent, MenuBarComponent, SettingsComponent],
+  declarations: [AppComponent, TitleBarComponent, MenuBarComponent, SettingsComponent, LoadingPageComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -49,6 +51,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     CoreModule,
     SharedModule,
     AddonsModule,
@@ -68,4 +71,4 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
