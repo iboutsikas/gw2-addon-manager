@@ -1,0 +1,22 @@
+<form [formGroup]="group">
+    <div class="form-group">
+        <label for="game-path">{{ 'GLOBALS.GAMEPATH' | translate }}</label>
+        <div class="form-control">
+            <input id="game-path" type="text" formControlName="gamepath"/>
+            <button class="settings-button" (click)="onBrowseCliked()">
+                <mat-icon>folder</mat-icon>
+                Browse
+            </button>
+        </div>
+        <div *ngIf="group.controls['gamepath'].invalid && (group.controls['gamepath'].dirty || group.controls['gamepath'].touched)" class="error-messages">
+            <span *ngIf="group.controls['gamepath'].errors.invalidPath">{{ 'COMPONENTS.SETTINGS.INVALID_PATH' | translate }}</span>
+            <span *ngIf="group.controls['gamepath'].errors.doesNotExist">{{ 'COMPONENTS.SETTINGS.MISSING_PATH' | translate }}</span>
+            <span *ngIf="group.controls['gamepath'].errors.noExe">{{ 'COMPONENTS.SETTINGS.MISSING_EXE' | translate }}</span>
+        </div>
+        <div *ngIf="group.valid" class="valid-messages">
+            <span>{{ 'COMPONENTS.SETTINGS.VALID_PATH' | translate}}</span>
+        </div>
+    </div>
+</form>
+
+
