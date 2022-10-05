@@ -5,7 +5,6 @@ import * as fsp from 'node:fs/promises';
 import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
-import { handleInstallAddons } from './utils';
 import { AddonManagerConfig } from '../common';
 import { IPCMessages } from '../common';
 

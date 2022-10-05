@@ -9,22 +9,24 @@ import * as semver from 'semver';
 
 import { app } from 'electron';
 
-import { Addon, AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, Loader }  from '../../common'
+import { Addon, AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, Loader } from '../../common'
+import { AddonInstaller } from '../addons/addonInstaller';
+import { AddonInstallationPaths } from '../interfaces/general-interfaces';
 
 const MAGICFILE_FILENAME = 'gw2addonmanager';
 
 
 
 export class AddonManager {
-   
-    constructor() {}
+
+    constructor() { }
 
     public getConfig(): Promise<AddonManagerConfig> {
         const result: Promise<AddonManagerConfig> = new Promise((resolve, reject) => {
             storage.get('config', (err, data: AddonManagerConfig) => {
                 if (err) reject(err);
 
-                let config = (Object.keys(data).length != 0) ? data :  { gamepath: '', locale: 'en-US' };
+                let config = (Object.keys(data).length != 0) ? data : { gamepath: '', locale: 'en-US' };
                 resolve(config);
             })
         })
@@ -48,7 +50,7 @@ export class AddonManager {
     public async readMagicFile(config: AddonManagerConfig | string = null): Promise<InstallationInfo> {
         let gamepath = '';
 
-        if (typeof(config) == "string") {
+        if (typeof (config) == "string") {
             gamepath = config;
         }
         else {
@@ -94,8 +96,8 @@ export class AddonManager {
                 await fsp.mkdir(disabledDir);
             }
         }
-        finally {      
-            return installationInfo;      
+        finally {
+            return installationInfo;
         }
     }
 
@@ -103,13 +105,13 @@ export class AddonManager {
         const result: Promise<any> = new Promise(async (resolve, reject) => {
             const config = await this.getConfig();
             let installationInfo = null;
-    
+
             if (config.gamepath != '') {
                 try {
                     installationInfo = await this.readMagicFile(config);
                 }
-                catch(err) {
-                    log.info( 'We have a gamepath but no magic file, setup probably failed half-way through. Ingorring for now');
+                catch (err) {
+                    log.info('We have a gamepath but no magic file, setup probably failed half-way through. Ingorring for now');
                 }
             }
 
@@ -126,7 +128,7 @@ export class AddonManager {
         try {
 
             const didUpdate = await this.installOrUpdateLoader(config.gamepath, installationInfo, loader);
-            
+
             if (didUpdate) {
                 installationInfo.loader = {
                     installed: true,
@@ -136,8 +138,31 @@ export class AddonManager {
                 await this.writeMagicFile(installationInfo, config.gamepath);
             }
         }
-        catch(err) {
+        catch (err) {
             log.error(`[AddonManager] Failed to install or update loader: ${err}`)
+        }
+
+        const tmpPath = app.getPath("temp");
+        const installer = new AddonInstaller(config.gamepath);
+
+        for (let addon of addons) {
+            log.info(`Processing addon ${addon.addon_name}`);
+
+            try {
+                const downloadPath = path.join(tmpPath, addon.nickname);
+                await download(addon.download_url, downloadPath);
+                log.info(`Saved file at: ${downloadPath}`);
+
+                let paths: AddonInstallationPaths = {};
+
+                paths.download = downloadPath;
+                paths.tmp = tmpPath;
+
+                await installer.installAddon(addon, paths);
+
+            } catch (error) {
+                log.error(`Error processing ${addon.addon_name}: ${error.message}`);
+            }
         }
 
     }
@@ -168,10 +193,10 @@ export class AddonManager {
         const extractPath = `${downloadPath}_unzipped`;
         log.info(`Extracting ${archivePath} to ${extractPath}`);
         await zip.extractAllTo(extractPath);
-        
+
         const files = await fsp.readdir(extractPath);
 
-        await fs.copy(extractPath, gamepath, { overwrite: true, recursive: true})
+        await fs.copy(extractPath, gamepath, { overwrite: true, recursive: true })
         return true;
     }
 }
