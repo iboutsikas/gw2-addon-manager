@@ -1,4 +1,4 @@
-import { Addon } from "./addons/addon-interfaces";
+import { Addon, HashMap } from "./addons/addon-interfaces";
 
 export interface InitializationRequirements {
     settings: Boolean,
@@ -33,7 +33,7 @@ export interface Manager
 
 export interface APIResponse 
 {
-    addons: Map<string, Addon>;
+    addons: HashMap<Addon>;
     loader: Loader;
     manager: Manager;
 };

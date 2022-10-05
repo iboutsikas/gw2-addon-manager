@@ -31,8 +31,8 @@ export class AddonsMainComponent implements OnInit {
   ) {
     this.installed$ = this.store.select(selectInstalledAddons)
     .pipe(shareReplay())
-
     // .pipe(tap(addons => console.log('Installed addons as seen from the main component', addons)));
+    
     this.haveAddonsInstalled$ = this.installed$.pipe(
       map(addons => addons && addons.length != 0)
     );

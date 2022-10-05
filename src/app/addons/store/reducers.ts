@@ -6,8 +6,8 @@ import { AddonState } from './state';
 import { Addon, InstalledAddonMetadata } from '@gw2-am/common';
 
 const initialState: AddonState = {
-    addons: new Map<string, Addon>(),
-    installed: new Map<string, InstalledAddonMetadata>()
+    addons: {},
+    installed: {}
 };
 
 // const mapToIdAsKey = (props: ReadonlyArray<AddonFromJSON>): any => {
@@ -58,17 +58,22 @@ export const addonsReducer = createReducer(
     }),
     on(actions.installAddons, (state, action) => {
         let newAddons = { ...state.addons };
-        for (let [key, value] of action.addonsToInstall) {
+
+        Object.keys(action.addonsToInstall).forEach(key => {
             newAddons[key] = {...state.addons[key], being_processed: true };
-        }
+        });
         return { ...state, addons: newAddons }
     }),
     on(actions.installAddonsSuccess, (state, action) => {
         let newAddons = { ...state.addons };
-        for (let key of action.addonKeys) {
-            newAddons[key] = {...newAddons[key], being_processed: false}
+        let installed = { ...state.installed };
+
+        for (let addon of action.addons) {
+            newAddons[addon.name] = {...newAddons[addon.name], being_processed: false}
+            installed[addon.name] = addon;
         }
-        return { ...state, addons: newAddons }
+
+        return { ...state, addons: newAddons, installed: installed }
     }),
     on(actions.installAddonsFail, (state, action) => {
         let newAddons = { ...state.addons };
@@ -77,4 +82,6 @@ export const addonsReducer = createReducer(
         }
         return { ...state, addons: newAddons }
     })
+
+
 )

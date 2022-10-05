@@ -177,7 +177,7 @@ export class AddonManager {
 
 
         // Update the magic file
-
+        const metadata = [];
         for (let addon of successes) {
             const newMetadata: InstalledAddonMetadata = {
                 name: addon.nickname,
@@ -186,6 +186,7 @@ export class AddonManager {
             }
             
             installationInfo.addons[addon.nickname] = newMetadata;
+            metadata.push(newMetadata);
         }
 
         if (successes.length != 0) {
@@ -193,7 +194,7 @@ export class AddonManager {
             await this.writeMagicFile(installationInfo, config.gamepath);
         }
         
-        return { successes : successes.map(a => a.nickname), failures: failures.map(a => a.nickname )}
+        return { successes : metadata, failures: failures.map(a => a.nickname )}
     }
 
     private async installOrUpdateLoader(gamepath: string, installationInfo: InstallationInfo, loader: Loader) {

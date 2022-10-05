@@ -12,7 +12,7 @@ import * as appActions from '../../store/actions';
 import { APP_CONFIG } from '../../../environments/environment'
 import { AddonService } from "../services/addon.service";
 import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
-import { Addon, AddonManagerConfig, APIResponse, InstallationInfo } from "@gw2-am/common";
+import { Addon, AddonManagerConfig, APIResponse, HashMap, InstallationInfo } from "@gw2-am/common";
 import { selectGamepath } from "app/store/selectors";
 import { AppEffects } from "app/store/effects";
 import { selectLoaderDownloadData } from "./selectors";
@@ -65,15 +65,14 @@ export class AddonEffects {
         map(action => action.addonsToInstall),
         bufferDebounce(2 * 1000),
         filter(installations => installations.length !== 0),
-        map((installations: Map<string, Addon>[]) => {
+        map((installations: HashMap<Addon>[]) => {
             // Here we want to combine all of the hash maps
             // into a single hash map. This will remove all duplicates
             let result = {};
             for (let installation of installations) {
-                // entry will be like ["nickname", { object with data}]
-                for (let [key, value] of installation) {
-                    result[key] = value;
-                }
+                Object.keys(installation).forEach(key => {
+                    result[key] = installation[key];
+                })
             }
             return result;
         }),
@@ -88,7 +87,7 @@ export class AddonEffects {
     
     installAddonsSuccess$ = createEffect(() => this.installAddons$.pipe(
         map((value: any) => value.successes),
-        map(keys => addonActions.installAddonsSuccess({ addonKeys: keys}))
+        map(installedAddons => addonActions.installAddonsSuccess({ addons: installedAddons}))
     ))
 
     installAddonsFail$ = createEffect(() => this.installAddons$.pipe(

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Addon } from '@gw2-am/common';
+import { Addon, HashMap } from '@gw2-am/common';
 import { Store } from '@ngrx/store';
 import { AppState } from 'app/store/state';
 
@@ -27,8 +27,8 @@ export class AddonsTableComponent implements OnInit {
   }
 
   onInstallClicked(addon: Addon): void {
-    const payload: Map<string, Addon> = new Map<string, Addon>();
-    payload.set(addon.nickname, addon);
+    const payload: HashMap<Addon> = {}
+    payload[addon.nickname] = addon;
     
     this.store.dispatch(addonActions.installAddons({ addonsToInstall: payload }));
   }

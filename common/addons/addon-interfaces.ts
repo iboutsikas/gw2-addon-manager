@@ -16,7 +16,7 @@ export interface LoaderMetaData {
 
 export interface InstallationInfo {
     version: number;
-    addons: Map<string, InstalledAddonMetadata>;
+    addons: HashMap<InstalledAddonMetadata>;
     loader?: LoaderMetaData;
 }
 
@@ -38,4 +38,8 @@ export interface Addon {
     version_id_is_human_readable: boolean;
     download_url: string;
     being_processed?: boolean;
+}
+
+export interface HashMap<TValue> {
+    [key: string]: TValue;
 }
