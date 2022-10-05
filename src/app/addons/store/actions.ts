@@ -1,5 +1,6 @@
 import { Addon,InstallationInfo,Loader, Manager } from '@gw2-am/common';
 import { createAction, props } from '@ngrx/store';
+import { AddonState } from './state';
 
 
 export const installAddons = createAction(
@@ -33,7 +34,7 @@ export const fetchAddons = createAction(
 
 export const fetchAddonsSuccess = createAction (
     '[Addons] Fetch addons success',
-    props<{ addons?: Map<string, Addon>, loader?: Loader, manager?: Manager }>()
+    props<AddonState>()
 )
 
 export const fetchAddonsFailure = createAction (

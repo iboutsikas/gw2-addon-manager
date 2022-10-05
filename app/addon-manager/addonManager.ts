@@ -2,9 +2,14 @@ import * as storage from 'electron-json-storage';
 import * as fs from 'fs-extra';
 import * as fsp from 'node:fs/promises';
 import * as path from "path";
+import * as download from 'download';
+import * as admzip from 'adm-zip'
 import * as log from 'electron-log';
+import * as semver from 'semver';
 
-import { AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo }  from '../../common'
+import { app } from 'electron';
+
+import { Addon, AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, Loader }  from '../../common'
 
 const MAGICFILE_FILENAME = 'gw2addonmanager';
 
@@ -80,6 +85,14 @@ export class AddonManager {
 
             installationInfo = createDefaultInstallationInfo();
             await this.writeMagicFile(installationInfo, gamepath);
+            const addonsDir = path.join(gamepath, 'addons');
+            if (! await fs.pathExists(addonsDir)) {
+                await fsp.mkdir(addonsDir);
+            }
+            const disabledDir = path.join(gamepath, 'disabled-addons');
+            if (! await fs.pathExists(disabledDir)) {
+                await fsp.mkdir(disabledDir);
+            }
         }
         finally {      
             return installationInfo;      
@@ -104,6 +117,62 @@ export class AddonManager {
         });
 
         return result;
+    }
+
+    public async installAddons(addons: Addon[], loader: Loader) {
+        const config = await this.getConfig();
+        const installationInfo = await this.readMagicFile(config);
+
+        try {
+
+            const didUpdate = await this.installOrUpdateLoader(config.gamepath, installationInfo, loader);
+            
+            if (didUpdate) {
+                installationInfo.loader = {
+                    installed: true,
+                    version: loader.version_id
+                }
+
+                await this.writeMagicFile(installationInfo, config.gamepath);
+            }
+        }
+        catch(err) {
+            log.error(`[AddonManager] Failed to install or update loader: ${err}`)
+        }
+
+    }
+
+    private async installOrUpdateLoader(gamepath: string, installationInfo: InstallationInfo, loader: Loader) {
+        let needsUpdate = !!!installationInfo.loader;
+        if (installationInfo.loader) {
+            needsUpdate &&= semver.gt(loader.version_id, installationInfo.loader.version)
+        }
+
+        if (!needsUpdate) {
+            log.info('[AddonManager] Addon loader does not need update');
+            return false;
+        }
+
+        log.info('[AddonManager] Need to update addon loader');
+        const tmpPath = app.getPath("temp");
+
+        const downloadPath = path.join(tmpPath, loader.wrapper_nickname);
+        await download(loader.download_url, downloadPath);
+        log.info(`Saved file at: ${downloadPath}`);
+
+        const archiveName = path.basename(loader.download_url);
+        const archivePath = path.join(downloadPath, archiveName);
+
+        let zip = new admzip(archivePath);
+
+        const extractPath = `${downloadPath}_unzipped`;
+        log.info(`Extracting ${archivePath} to ${extractPath}`);
+        await zip.extractAllTo(extractPath);
+        
+        const files = await fsp.readdir(extractPath);
+
+        await fs.copy(extractPath, gamepath, { overwrite: true, recursive: true})
+        return true;
     }
 }
 

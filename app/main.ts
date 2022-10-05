@@ -127,7 +127,10 @@ try {
     return result;
   });
 
-  ipcMain.handle('install-addons', async (event, addons) => await handleInstallAddons(addons))
+  ipcMain.handle(IPCMessages.INSTALL_ADDONS, async (event, addons, loader) => {
+    await manager.installAddons(addons, loader);
+    return '';
+  })
 
   ipcMain.handle(IPCMessages.OPEN_FILE_DIALOG, async (event, p) => {
     const thing = await dialog.showOpenDialog(win, { properties: ['openDirectory']})

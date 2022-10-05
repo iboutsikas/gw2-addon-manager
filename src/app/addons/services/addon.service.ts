@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import * as addonActions from '../store/actions';
 
 import { APP_CONFIG } from '../../../environments/environment'
-import { Addon, InstallationInfo } from '@gw2-am/common';
+import { Addon, InstallationInfo, Loader } from '@gw2-am/common';
 import { IPCMessages } from '../../../../app/dist/out-tsc/common/ipcMessages';
 
 // interface InstallationInformation {
@@ -38,8 +38,8 @@ export class AddonService {
     this.store.dispatch(addonActions.fetchAddons());
   }
 
-  public installAddons(addons: Addon[]): Observable<any> {
-    this.es.ipcRenderer.invoke('install-addons', addons).then(result => {
+  public installAddons(addons: Addon[], loaderDownloadData: Loader): Observable<any> {
+    this.es.ipcRenderer.invoke(IPCMessages.INSTALL_ADDONS, addons, loaderDownloadData).then(result => {
 
     });
 

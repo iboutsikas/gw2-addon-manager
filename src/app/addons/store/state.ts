@@ -4,4 +4,5 @@ export interface AddonState {
     addons?: Map<string, Addon>;
     installed?: Map<string, InstalledAddonMetadata>;
     loaderMetadata?: LoaderMetaData;
+    loaderDownloadData?: Loader;
 }

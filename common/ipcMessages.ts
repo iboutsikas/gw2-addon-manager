@@ -5,5 +5,6 @@ export const IPCMessages ={
     LOAD_CONFIG: 'load-config',
     SAVE_CONFIG: 'save-config',
     INITIALIZE_INSTANCE: 'initialize-instance',
-    OPEN_FILE_DIALOG: 'open-file-dialog'
+    OPEN_FILE_DIALOG: 'open-file-dialog',
+    INSTALL_ADDONS: 'install-addons'
 };

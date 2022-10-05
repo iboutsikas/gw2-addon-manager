@@ -9,6 +9,11 @@ export const selectLoaderMetadata = createSelector(
     (feature) => feature.loaderMetadata
 )
 
+export const selectLoaderDownloadData = createSelector(
+    selectAddonsFeature,
+    (feature) => feature.loaderDownloadData
+)
+
 export const selectAllAddons = createSelector(
     selectAddonsFeature,
     (feature) => feature.addons

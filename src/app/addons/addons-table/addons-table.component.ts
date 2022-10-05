@@ -28,8 +28,8 @@ export class AddonsTableComponent implements OnInit {
 
   onInstallClicked(addon: Addon): void {
     const payload: Map<string, Addon> = new Map<string, Addon>();
-
-    payload[addon.nickname] = addon;
+    payload.set(addon.nickname, addon);
+    
     this.store.dispatch(addonActions.installAddons({ addonsToInstall: payload }));
   }
 

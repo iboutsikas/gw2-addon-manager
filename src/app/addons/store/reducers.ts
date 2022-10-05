@@ -53,8 +53,8 @@ export const addonsReducer = createReducer(
     on(actions.updateInstallationInfo, (state, { info }) => {
         return { ...state, installed: info.addons, loaderMetadata: info.loader }
     }),
-    on(actions.fetchAddonsSuccess, (state, { addons, loader }) => {
-        return { ...state, addons: addons, loader: loader };
+    on(actions.fetchAddonsSuccess, (state, { addons, loaderDownloadData }) => {
+        return { ...state, addons, loaderDownloadData };
     }),
     on(actions.installAddons, (state, action) => {
         let newAddons = { ...state.addons };

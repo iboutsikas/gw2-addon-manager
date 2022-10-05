@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, NgZone } from "@angular/core";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
-import { switchMap, map, tap, catchError, bufferTime, filter, observeOn, asyncScheduler, queueScheduler } from 'rxjs';
+import { switchMap, map, tap, catchError, bufferTime, filter, observeOn, asyncScheduler, queueScheduler, OperatorFunction, Observable, buffer, debounceTime } from 'rxjs';
 
 import { AppState } from "../../store/state";
 import * as addonActions from './actions'
@@ -15,7 +15,25 @@ import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
 import { Addon, AddonManagerConfig, APIResponse, InstallationInfo } from "@gw2-am/common";
 import { selectGamepath } from "app/store/selectors";
 import { AppEffects } from "app/store/effects";
+import { selectLoaderDownloadData } from "./selectors";
 
+
+type BufferDebounce = <T>(debounce: number) => OperatorFunction<T, T[]>;
+
+const bufferDebounce: BufferDebounce = debounce => source =>
+  new Observable(observer => 
+    source.pipe(buffer(source.pipe(debounceTime(debounce)))).subscribe({
+      next(x) {
+        observer.next(x);
+      },
+      error(err) {
+        observer.error(err);
+      },
+      complete() {
+        observer.complete();
+      },
+  })
+);
 
 @Injectable()
 export class AddonEffects {
@@ -71,7 +89,7 @@ export class AddonEffects {
     fetchAddons$ = createEffect(() => this.actions$.pipe(
         ofType(addonActions.fetchAddons),
         switchMap(_ => this.http.get<APIResponse>('assets/test-data.json').pipe(
-            map((res: APIResponse) => addonActions.fetchAddonsSuccess({addons: res.addons, loader: res.loader })),
+            map((res: APIResponse) => addonActions.fetchAddonsSuccess({addons: res.addons, loaderDownloadData: res.loader })),
             catchError(err => addonActions.fetchAddonsFailure(err))
         ))
     ));
@@ -79,22 +97,24 @@ export class AddonEffects {
     installAddons$ = createEffect(() => this.actions$.pipe(
         ofType(addonActions.installAddons),
         map(action => action.addonsToInstall),
-        bufferTime(1 * 1000),
+        bufferDebounce(5 * 1000),
         filter(installations => installations.length !== 0),
         map((installations: Map<string, Addon>[]) => {
             // Here we want to combine all of the hash maps
             // into a single hash map. This will remove all duplicates
             let result = {};
             for (let installation of installations) {
-                Object.keys(installation).forEach(key => {
-                    result[key] = installation[key];
-                })
+                // entry will be like ["nickname", { object with data}]
+                for (let entry of installation) {
+                    result[entry[0]] = entry[1];
+                }
             }
             return result;
         }),
         // Now map them into an array of objects
         map(installations => Object.keys(installations).map(key => installations[key])),
-        switchMap(addons => this.addonService.installAddons(addons)),
+        concatLatestFrom(_ => this.store.select(selectLoaderDownloadData)),
+        switchMap(([addons, loader]) => this.addonService.installAddons(addons, loader)),
         tap(console.log)
     ), { dispatch: false });
 
