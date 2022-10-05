@@ -4,8 +4,18 @@ import { AddonState } from './state';
 
 
 export const installAddons = createAction(
-    '[Addons] Add installed addons',
+    '[Addons] Install addons',
     props<{ addonsToInstall: Map<string, Addon> }>()
+)
+
+export const installAddonsSuccess = createAction(
+    '[Addons] Install addons success',
+    props<{ addonKeys: string[] }>()
+)
+
+export const installAddonsFail = createAction(
+    '[Addons] Install addons Fail',
+    props<{ addonKeys: string[] }>()
 )
 
 export const removeAddonsInstalled = createAction(

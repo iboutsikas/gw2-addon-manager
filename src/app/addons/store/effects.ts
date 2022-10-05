@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, NgZone } from "@angular/core";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
-import { switchMap, map, tap, catchError, bufferTime, filter, observeOn, asyncScheduler, queueScheduler, OperatorFunction, Observable, buffer, debounceTime } from 'rxjs';
+import { switchMap, map, tap, catchError, bufferTime, filter, observeOn, asyncScheduler, queueScheduler, OperatorFunction, Observable, buffer, debounceTime, shareReplay } from 'rxjs';
 
 import { AppState } from "../../store/state";
 import * as addonActions from './actions'
@@ -21,49 +21,22 @@ import { selectLoaderDownloadData } from "./selectors";
 type BufferDebounce = <T>(debounce: number) => OperatorFunction<T, T[]>;
 
 const bufferDebounce: BufferDebounce = debounce => source =>
-  new Observable(observer => 
-    source.pipe(buffer(source.pipe(debounceTime(debounce)))).subscribe({
-      next(x) {
-        observer.next(x);
-      },
-      error(err) {
-        observer.error(err);
-      },
-      complete() {
-        observer.complete();
-      },
-  })
-);
+    new Observable(observer =>
+        source.pipe(buffer(source.pipe(debounceTime(debounce)))).subscribe({
+            next(x) {
+                observer.next(x);
+            },
+            error(err) {
+                observer.error(err);
+            },
+            complete() {
+                observer.complete();
+            },
+        })
+    );
 
 @Injectable()
 export class AddonEffects {
-
-
-
-    // installationFile$ = createEffect(() => 
-    //     this.store.select(state => state.config.gamePath).pipe(
-    //         filter(path => path && path.trim() !== ''),
-    //         observeOn(leaveZone(this.zone, asyncScheduler)),
-    //         switchMap(path => this.addonService.initializeInstallation(path)),
-    //         observeOn(enterZone(this.zone, queueScheduler)),
-    //         map(info => info.addons),
-    //         map(addons => {
-    //             let hash = {}
-    //             for (let addon of addons) {
-    //                 hash[addon.id] = addon;
-    //             }
-    //             return hash;
-    //         }),
-    //         map(addons => addonActions.addAddonsInstalled({ updates: addons }))
-    //     ));
-    
-    // setupInstallation$ = createEffect(() => this.store.select(state => state.config.gamePath).pipe(
-    //     filter(path => path && path.trim() !== ''),
-    //     observeOn(leaveZone(this.zone, asyncScheduler)),
-    //     switchMap(path => this.addonService.initializeInstallation(path)),
-    //     observeOn(enterZone(this.zone, queueScheduler))
-    // ), { dispatch: false });
-
     initializeInstance$ = createEffect(() => this.store.select(selectGamepath).pipe(
         filter(gamepath => gamepath.trim() != ''),
         observeOn(leaveZone(this.zone, asyncScheduler)),
@@ -71,13 +44,6 @@ export class AddonEffects {
         observeOn(enterZone(this.zone, queueScheduler)),
         map(info => addonActions.updateInstallationInfo({ info }))
     ));
-
-    // appHasInstallationInfo$ = createEffect(() => this.appEffects.appInitialize$.pipe(
-    //     filter((result: {config: AddonManagerConfig, installationInfo: InstallationInfo | null}) => result.installationInfo != null),
-    //     map(value => value.installationInfo),
-    //     map(info => addonActions.updateInstallationInfo({ info }))  
-    // ));
-    
 
     fetchAddonsOnInit$ = createEffect(() => this.actions$.pipe(
         ofType(appActions.appInitialize),
@@ -89,15 +55,15 @@ export class AddonEffects {
     fetchAddons$ = createEffect(() => this.actions$.pipe(
         ofType(addonActions.fetchAddons),
         switchMap(_ => this.http.get<APIResponse>('assets/test-data.json').pipe(
-            map((res: APIResponse) => addonActions.fetchAddonsSuccess({addons: res.addons, loaderDownloadData: res.loader })),
+            map((res: APIResponse) => addonActions.fetchAddonsSuccess({ addons: res.addons, loaderDownloadData: res.loader })),
             catchError(err => addonActions.fetchAddonsFailure(err))
         ))
     ));
 
-    installAddons$ = createEffect(() => this.actions$.pipe(
+    installAddons$ = this.actions$.pipe(
         ofType(addonActions.installAddons),
         map(action => action.addonsToInstall),
-        bufferDebounce(5 * 1000),
+        bufferDebounce(2 * 1000),
         filter(installations => installations.length !== 0),
         map((installations: Map<string, Addon>[]) => {
             // Here we want to combine all of the hash maps
@@ -105,8 +71,8 @@ export class AddonEffects {
             let result = {};
             for (let installation of installations) {
                 // entry will be like ["nickname", { object with data}]
-                for (let entry of installation) {
-                    result[entry[0]] = entry[1];
+                for (let [key, value] of installation) {
+                    result[key] = value;
                 }
             }
             return result;
@@ -114,9 +80,22 @@ export class AddonEffects {
         // Now map them into an array of objects
         map(installations => Object.keys(installations).map(key => installations[key])),
         concatLatestFrom(_ => this.store.select(selectLoaderDownloadData)),
+        observeOn(leaveZone(this.zone, asyncScheduler)),
         switchMap(([addons, loader]) => this.addonService.installAddons(addons, loader)),
-        tap(console.log)
-    ), { dispatch: false });
+        observeOn(enterZone(this.zone, queueScheduler)),
+        shareReplay()
+    );
+    
+    installAddonsSuccess$ = createEffect(() => this.installAddons$.pipe(
+        map((value: any) => value.successes),
+        map(keys => addonActions.installAddonsSuccess({ addonKeys: keys}))
+    ))
+
+    installAddonsFail$ = createEffect(() => this.installAddons$.pipe(
+        map((value: any) => value.failures),
+        map(keys => addonActions.installAddonsFail({ addonKeys: keys}))
+    ))
+
 
     // @ts-ignore
     // updateStatus$ = createEffect(() => this.actions$.pipe(
@@ -156,7 +135,7 @@ export class AddonEffects {
     //             changedAddons.push(copy);
     //         }
 
-           
+
     //         return changedAddons;
     //     }),
     //     observeOn(leaveZone(this.zone, asyncScheduler)),

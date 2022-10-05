@@ -9,7 +9,7 @@ import * as semver from 'semver';
 
 import { app } from 'electron';
 
-import { Addon, AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, Loader } from '../../common'
+import { Addon, AddonManagerConfig, AddonStatus, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, InstalledAddonMetadata, Loader } from '../../common'
 import { AddonInstaller } from '../addons/addonInstaller';
 import { AddonInstallationPaths } from '../interfaces/general-interfaces';
 
@@ -123,6 +123,8 @@ export class AddonManager {
 
     public async installAddons(addons: Addon[], loader: Loader) {
         const config = await this.getConfig();
+
+        // TODO: Lock this somehow so no parallel shenanigans
         const installationInfo = await this.readMagicFile(config);
 
         try {
@@ -140,10 +142,14 @@ export class AddonManager {
         }
         catch (err) {
             log.error(`[AddonManager] Failed to install or update loader: ${err}`)
+            return { successes: [], failures: addons.map(a => a.nickname)}
         }
 
         const tmpPath = app.getPath("temp");
         const installer = new AddonInstaller(config.gamepath);
+
+        const successes: Addon[] = []
+        const failures: Addon[] = []
 
         for (let addon of addons) {
             log.info(`Processing addon ${addon.addon_name}`);
@@ -159,12 +165,35 @@ export class AddonManager {
                 paths.tmp = tmpPath;
 
                 await installer.installAddon(addon, paths);
+                successes.push(addon)
+                log.info(`[AddonManager] Installed addon ${addon.addon_name}`);
+
 
             } catch (error) {
                 log.error(`Error processing ${addon.addon_name}: ${error.message}`);
+                failures.push(addon);
             }
         }
 
+
+        // Update the magic file
+
+        for (let addon of successes) {
+            const newMetadata: InstalledAddonMetadata = {
+                name: addon.nickname,
+                status: AddonStatus.ENABLED,
+                version: addon.version_id
+            }
+            
+            installationInfo.addons[addon.nickname] = newMetadata;
+        }
+
+        if (successes.length != 0) {
+            log.info('[AddonManager] Updating the magic file');
+            await this.writeMagicFile(installationInfo, config.gamepath);
+        }
+        
+        return { successes : successes.map(a => a.nickname), failures: failures.map(a => a.nickname )}
     }
 
     private async installOrUpdateLoader(gamepath: string, installationInfo: InstallationInfo, loader: Loader) {

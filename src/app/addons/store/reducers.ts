@@ -58,9 +58,23 @@ export const addonsReducer = createReducer(
     }),
     on(actions.installAddons, (state, action) => {
         let newAddons = { ...state.addons };
-        Object.keys(action.addonsToInstall).forEach(key => {
+        for (let [key, value] of action.addonsToInstall) {
             newAddons[key] = {...state.addons[key], being_processed: true };
-        });
+        }
+        return { ...state, addons: newAddons }
+    }),
+    on(actions.installAddonsSuccess, (state, action) => {
+        let newAddons = { ...state.addons };
+        for (let key of action.addonKeys) {
+            newAddons[key] = {...newAddons[key], being_processed: false}
+        }
+        return { ...state, addons: newAddons }
+    }),
+    on(actions.installAddonsFail, (state, action) => {
+        let newAddons = { ...state.addons };
+        for (let key of action.addonKeys) {
+            newAddons[key] = {...newAddons[key], being_processed: false}
+        }
         return { ...state, addons: newAddons }
     })
 )

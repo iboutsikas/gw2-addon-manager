@@ -40,7 +40,7 @@ export class AddonService {
 
   public installAddons(addons: Addon[], loaderDownloadData: Loader): Observable<any> {
     this.es.ipcRenderer.invoke(IPCMessages.INSTALL_ADDONS, addons, loaderDownloadData).then(result => {
-
+      this.installAddonsSubject.next(result);
     });
 
 
