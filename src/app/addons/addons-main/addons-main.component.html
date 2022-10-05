@@ -1,95 +1,24 @@
-<mat-tab-group>
+<mat-tab-group 
+    [selectedIndex]="selectedIndex"
+    (selectedIndexChange)="selectedIndex = $event">
     <mat-tab [label]="'PAGES.ADDONS.MY_ADDONS' | translate">
-        <mat-table [dataSource]="installed$ | async" class="test-class">
-            <ng-container matColumnDef="name">
-                <mat-header-cell *matHeaderCellDef>Addon</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    <div class="addon-name-wrapper">
-                        <span class="addon-name">{{ addon.addon_name }}</span>
-                        <span class="addon-version"> {{addon.version_id }}</span>
-                    </div>
-                </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-                <mat-cell *matCellDef="let addon">
-                    <div class="actions-wrapper" *ngIf="!addon.beingProcessed; else addonProcessed">
-                        <button mat-flat-button color="accent" *ngIf="addon.needsUpdate">Update</button>
-                        <button mat-stroked-button color="primary"
-                        *ngIf="addon.status == 0"
-                        (click)="onDisableClicked(addon)">
-                            Disable
-                        </button>2
-                        <button mat-stroked-button color="primary"
-                        *ngIf="addon.status == 1"
-                        (click)="onEnableClicked(addon)">
-                            Enable
-                        </button>
-                        <button mat-stroked-button color="warn" (click)="onUninstallClicked(addon)">Remove</button>
-                    </div>
-                    <ng-template #addonProcessed>
-                        <span>Working on it...</span>
-                    </ng-template>
-                </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="latestVersion">
-                <mat-header-cell *matHeaderCellDef>Latest Version</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    {{ addon.version_id }}
-                </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="author">
-                <mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
-                <mat-cell *matCellDef="let addon">
-                    <span>
-                        {{ addon.developer }}
-                    </span>
-                </mat-cell>
-            </ng-container>
-
-            <mat-header-row mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
-            <mat-row mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></mat-row>
-        </mat-table>
+        <app-addons-table 
+            *ngIf="haveAddonsInstalled$ | async; else noAddonsBlock" 
+            [addons]="installed$ | async">
+        </app-addons-table>
     </mat-tab>
     <mat-tab [label]="'PAGES.ADDONS.GET_MORE_ADDONS' | translate">
-        <mat-table [dataSource]="available$ | async" class="test-class">
-            <ng-container matColumnDef="name">
-                <mat-header-cell *matHeaderCellDef>Addon</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> {{ addon.addon_name }}</mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    <button mat-stroked-button 
-                        *ngIf="!addon.being_processed; else addonProcessed"
-                        color="primary" 
-                        (click)="onInstallClicked(addon)">Install</button>
-                        <ng-template #addonProcessed>Working on it...</ng-template>
-                </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="latestVersion">
-                <mat-header-cell *matHeaderCellDef>Latest Version</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    <span *ngIf="addon.version_id_is_human_readable">{{ addon.version_id }}</span>    
-                </mat-cell>
-            </ng-container>
-
-            <ng-container matColumnDef="author">
-                <mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
-                <mat-cell *matCellDef="let addon"> 
-                    <span>
-                        {{ addon.developer }}
-                    </span>
-                </mat-cell>
-            </ng-container>
-
-            <mat-header-row mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
-            <mat-row mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></mat-row>
-        </mat-table>
+        <app-addons-table [addons]="available$ | async"></app-addons-table>
     </mat-tab>
 </mat-tab-group>
+
+<ng-template #noAddonsBlock>
+    <div id="no-addons-banner">
+        <p class="mat-h2">
+            You do not appear to have any addons installed.
+        </p>    
+        <button mat-raised-button color="primary" (click)="selectedIndex = 2">
+            Get addons
+        </button>
+    </div>
+</ng-template>

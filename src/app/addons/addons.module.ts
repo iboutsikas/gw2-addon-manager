@@ -13,12 +13,14 @@ import { addonsReducer } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { AddonEffects } from './store/effects';
 import { SharedModule } from 'app/shared/shared.module';
+import { AddonsTableComponent } from './addons-table/addons-table.component';
 
 
 
 @NgModule({
   declarations: [
-    AddonsMainComponent
+    AddonsMainComponent,
+    AddonsTableComponent
   ],
   imports: [ 
     CommonModule,

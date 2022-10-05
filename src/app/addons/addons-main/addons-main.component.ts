@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, shareReplay, tap } from 'rxjs';
 
 import { AddonService } from '../services/addon.service';
 import { selectAvailableAddons, selectInstalledAddons } from '../store/selectors';
@@ -19,8 +19,10 @@ export class AddonsMainComponent implements OnInit {
 
   public installed$: Observable<any>;
   public available$: Observable<any>;
+  public haveAddonsInstalled$: Observable<boolean>;
 
-  columnsToDisplay = ['name', 'actions', 'latestVersion', 'author'];
+  public selectedIndex: number = 0;
+  
 
   constructor(
     private addonService: AddonService,
@@ -28,42 +30,18 @@ export class AddonsMainComponent implements OnInit {
     
   ) {
     this.installed$ = this.store.select(selectInstalledAddons)
+    .pipe(shareReplay())
+
     // .pipe(tap(addons => console.log('Installed addons as seen from the main component', addons)));
-    
+    this.haveAddonsInstalled$ = this.installed$.pipe(
+      map(addons => addons && addons.length != 0)
+    );
+
     this.available$ = this.store.select(selectAvailableAddons)
     // .pipe(tap(addons => console.log('Available addons as seen from the main component', addons)));
   }
 
   ngOnInit(): void {
     this.addonService.fetchAllAddons();
-  }
-
-  onInstallClicked(addon: Addon): void {
-
-    const payload: Map<string, Addon> = new Map<string, Addon>();
-
-    payload[addon.nickname] = addon;
-    this.store.dispatch(addonActions.installAddons({ addonsToInstall: payload }));
-  }
-
-  onUninstallClicked(addon: Addon): void {
-    // const thing: AddonHashMap = { };
-    // thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: addon.status }
-    
-    // this.store.dispatch(addonActions.removeAddonsInstalled({ updates: thing } ))
-  }
-
-  onDisableClicked(addon: Addon): void {
-    // const thing: AddonHashMap = { };
-    // thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: AddonStatus.DISABLED }
-    
-    // this.store.dispatch(addonActions.updateAddonsStatus({ updates: thing } ))
-  }
-
-  onEnableClicked(addon: Addon): void {
-    // const thing: AddonHashMap = { };
-    // thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: AddonStatus.ENABLED }
-    
-    // this.store.dispatch(addonActions.updateAddonsStatus({ updates: thing } ))
   }
 }
