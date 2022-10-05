@@ -8,7 +8,7 @@
         </app-addons-table>
     </mat-tab>
     <mat-tab [label]="'PAGES.ADDONS.GET_MORE_ADDONS' | translate">
-        <app-addons-table [addons]="available$ | async"></app-addons-table>
+        <app-addons-table [addons]="available$ | async" [containsInstalledAddons]="false"></app-addons-table>
     </mat-tab>
 </mat-tab-group>
 

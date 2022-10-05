@@ -38,7 +38,7 @@ export class AddonsMainComponent implements OnInit {
     );
 
     this.available$ = this.store.select(selectAvailableAddons)
-    // .pipe(tap(addons => console.log('Available addons as seen from the main component', addons)));
+    //.pipe(tap(addons => console.log('Available addons as seen from the main component', addons)));
   }
 
   ngOnInit(): void {
