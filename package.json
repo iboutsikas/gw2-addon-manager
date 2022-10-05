@@ -21,7 +21,7 @@
     "mac",
     "linux"
   ],
-  "main": "app/main.js",
+  "main": "app/dist/out-tsc/app/main.js",
   "private": true,
   "scripts": {
     "postinstall": "electron-builder install-app-deps",

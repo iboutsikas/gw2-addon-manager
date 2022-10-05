@@ -1,6 +1,5 @@
-import { Addon,Loader } from '@gw2-am/common';
+import { Addon,Loader, Manager } from '@gw2-am/common';
 import { createAction, props } from '@ngrx/store';
-import { Manager } from '../addons.model';
 
 
 export const installAddons = createAction(

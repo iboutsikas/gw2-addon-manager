@@ -13,64 +13,6 @@ import { AddonInstallationPaths } from "./interfaces/general-interfaces";
 import { AddonInstaller } from "./addons/addonInstaller";
 import { InstallationInfo, InstalledAddonMetadata, AddonStatus, Addon } from "../common";
 
-const MAGIC_FILENAME = 'gw2addonmanager';
-
-const readInstallationFile = async () => {
-    const config = storage.getSync('config');
-    const filepath = path.join(config.gamePath, MAGIC_FILENAME);
-
-    const text = await fsp.readFile(filepath, 'utf8');
-    return JSON.parse(text);
-}
-
-export const initializeInstallation = async (gamePath) => {
-    // Check if we have the file
-    const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
-
-    let installFile: InstallationInfo = {
-        version: 1,
-        addons: new Map<string, InstalledAddonMetadata>()
-    };
-
-    // If we do have the file we trust it
-    if (fs.existsSync(installationFilePath)) {
-        const text = await fsp.readFile(installationFilePath, 'utf8');
-        installFile = JSON.parse(text);
-        console.log(`Found installation file at ${installationFilePath}`);
-    }
-    // If we don't we create it and we check for existing addons
-    else {
-        // First check for existing addons so we can create the file
-        const addonsFolder = path.join(gamePath, 'addons');
-        const disabledAddonsFolder = path.join(gamePath, 'disabled-addons');
-        if (fs.existsSync(addonsFolder)) {
-            const filenames = await fsp.readdir(addonsFolder);
-            for (let name of filenames) {
-                console.log(`Found existing addon at ${name}`);
-                installFile.addons[name] = { name: name, version: '', status: AddonStatus.ENABLED };
-            }
-        }
-        else {
-            await fsp.mkdir(addonsFolder);
-        }
-
-        if (fs.existsSync(disabledAddonsFolder)) {
-            const filenames = await fsp.readdir(disabledAddonsFolder);
-            for (let name of filenames) {
-                console.log(`Found existing disabled addon at ${name}`);
-                installFile.addons[name] = { name: name, version: '', status: AddonStatus.DISABLED };
-            }
-        }
-        else {
-            await fsp.mkdir(disabledAddonsFolder);
-        }
-        const text = JSON.stringify(installFile, null, 2);
-        console.log(`Creating file at ${installationFilePath}`)
-        await fsp.writeFile(installationFilePath, text);
-    }
-
-    return installFile;
-}
 
 export const handleInstallAddons = async (addons: Addon[]) => {
     const config = storage.getSync('config');
@@ -102,20 +44,6 @@ export const handleInstallAddons = async (addons: Addon[]) => {
     }
 }
 
-const updateInstallationFile = async (succeeded: Addon[]) => {
-    let installationInfo: InstallationInfo = await readInstallationFile();
-
-    for(let addon of succeeded) {
-        const a: InstalledAddonMetadata = {
-            name: addon.nickname,
-            status: AddonStatus.ENABLED,
-            version: addon.version_id_is_human_readable ?  addon.version_id  : addon.version_id.substring(0, 8)
-        };
-        installationInfo.addons[addon.nickname] = a;
-    }
-
-    // const installationFilePath = path.join(gamePath, MAGIC_FILENAME);
-}
 
 
 const installArcPlugin = async (paths:AddonInstallationPaths, addon: Addon) => {

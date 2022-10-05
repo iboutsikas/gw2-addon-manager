@@ -1,7 +1,7 @@
 import { AddonState } from "../addons/store/state";
 
 export interface AppConfig {
-    gamePath?: string;
+    gamepath?: string;
     locale?: string;
 }
 

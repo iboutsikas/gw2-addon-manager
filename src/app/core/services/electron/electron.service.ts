@@ -20,7 +20,7 @@ import { InitializationRequirements } from '../../../../../common/shared-interfa
 })
 export class ElectronService {
 
-  private initializeSubject$: Subject<InitializationRequirements> = new Subject();
+  private initializeSubject$: Subject<any> = new Subject();
 
   ipcRenderer: typeof ipcRenderer;
   webFrame: typeof webFrame;
@@ -39,10 +39,7 @@ export class ElectronService {
       this.path = window.require('path');
       
       this.childProcess = window.require('child_process');
-      
-      // this.jsonStorage = window.require('electron-json-storage');
-      // console.log(this.jsonStorage.getDataPath());
-
+    
       // Notes :
       // * A NodeJS's dependency imported with 'window.require' MUST BE present in `dependencies` of both `app/package.json`
       // and `package.json (root folder)` in order to make it work here in Electron's Renderer process (src folder)
@@ -64,13 +61,13 @@ export class ElectronService {
   requestClose(): void {
     if (!this.isElectron)
       return;
-    this.ipcRenderer.send('close-application');
+    this.ipcRenderer.send(IPCMessages.CLOSE_APPLICATION);
   }
 
   requestMinimize(): void {
     if (!this.isElectron)
       return;
-    this.ipcRenderer.send('minimize-application');
+    this.ipcRenderer.send(IPCMessages.MINIMIZE_APPLICATION);
   }
 
   loadConfig() : void {
@@ -94,14 +91,23 @@ export class ElectronService {
     })
   }
 
-  checkRequiresInitialization(): Observable<InitializationRequirements> {
+  openGamepathDialog(path: string | null = null): Promise<string> {
+    path = path || '';
+    const result = new Promise<string>((resolve, reject) => {
+      this.ipcRenderer.invoke(IPCMessages.OPEN_FILE_DIALOG, path).then(
+        result => resolve(result),
+        err => reject(err)
+      )
+    });
+    return result;
+  }
 
-    this.ipcRenderer.invoke(IPCMessages.CHECK_INITIALIZATION).then(
+  initializeAppBackend(): Observable<any> {
+    this.ipcRenderer.invoke(IPCMessages.INITIALIZE_APPLICATION).then(
       result => this.initializeSubject$.next(result),
       err => this.initializeSubject$.error(err)
-    );
+    )
 
     return this.initializeSubject$.asObservable();
   }
-
 }

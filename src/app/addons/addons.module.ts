@@ -12,19 +12,19 @@ import { StoreModule } from '@ngrx/store';
 import { addonsReducer } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { AddonEffects } from './store/effects';
-import { AddonManagerInitializerComponent } from './addon-manager-initializer/addon-manager-initializer.component';
+import { SharedModule } from 'app/shared/shared.module';
 
 
 
 @NgModule({
   declarations: [
-    AddonsMainComponent,
-    AddonManagerInitializerComponent
+    AddonsMainComponent
   ],
   imports: [ 
     CommonModule,
     HttpClientModule,
     AddonsRoutingModule, 
+    SharedModule,
     CoreModule, 
     MatTabsModule,
     MatTableModule,

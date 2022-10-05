@@ -6,7 +6,7 @@
     "email": "maxime.gris@gmail.com"
   },
   "version": "11.1.0",
-  "main": "main.js",
+  "main": "dist/out-tsc/app/main.js",
   "private": true,
   "devDependencies": {
     "electron-devtools-installer": "^3.2.0"

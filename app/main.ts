@@ -1,11 +1,11 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsp from 'node:fs/promises';
 import * as storage from 'electron-json-storage';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
-import { handleInstallAddons, initializeInstallation } from './utils';
+import { handleInstallAddons } from './utils';
 import { AddonManagerConfig } from '../common';
 import { IPCMessages } from '../common';
 
@@ -106,6 +106,11 @@ try {
     win.minimize();
   });
 
+  ipcMain.handle(IPCMessages.INITIALIZE_APPLICATION, async (event) => {
+    const result = await manager.initialize();
+    return result;
+  });
+
   ipcMain.handle(IPCMessages.LOAD_CONFIG, async (event) => {
     const config = await manager.getConfig();
     return config;
@@ -117,13 +122,17 @@ try {
     return await manager.saveConfig(config);
   });
 
-  ipcMain.handle(IPCMessages.CHECK_INITIALIZATION, async(event) => {
-    return await manager.requiresInitialization();
-  })
-
-  ipcMain.handle('initialize-installation', async (event, gamePath) => await initializeInstallation(gamePath));
+  ipcMain.handle(IPCMessages.INITIALIZE_INSTANCE, async (event, gamepath) => {
+    const result = await manager.initializeInstance(gamepath);
+    return result;
+  });
 
   ipcMain.handle('install-addons', async (event, addons) => await handleInstallAddons(addons))
+
+  ipcMain.handle(IPCMessages.OPEN_FILE_DIALOG, async (event, p) => {
+    const thing = await dialog.showOpenDialog(win, { properties: ['openDirectory']})
+    return thing;
+  });
 
   app.whenReady().then(() => {
     installExtension(REDUX_DEVTOOLS)

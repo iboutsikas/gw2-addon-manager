@@ -8,6 +8,7 @@ import * as addonActions from '../store/actions';
 
 import { APP_CONFIG } from '../../../environments/environment'
 import { Addon, InstallationInfo } from '@gw2-am/common';
+import { IPCMessages } from '../../../../app/dist/out-tsc/common/ipcMessages';
 
 // interface InstallationInformation {
 //   version: number;
@@ -23,15 +24,14 @@ import { Addon, InstallationInfo } from '@gw2-am/common';
   providedIn: 'root'
 })
 export class AddonService {
-  private statusUpdatesSubject: Subject<any> = new Subject();
-  private installationFileSubject: Subject<InstallationInfo> = new Subject();
-  private installAddonsSubject: Subject<any> = new Subject();
 
+  private statusUpdatesSubject: Subject<any> = new Subject();
+  private installAddonsSubject: Subject<any> = new Subject();
+  private instanceSubject: Subject<any> = new Subject();
   constructor(
     private es: ElectronService,
     private store: Store<AppState>
-  ) 
-  {
+  ) {
   }
 
   public fetchAllAddons(): void {
@@ -55,11 +55,12 @@ export class AddonService {
     return this.statusUpdatesSubject.asObservable();
   }
 
-  public initializeInstallation(path: string): Observable<InstallationInfo> {
-    this.es.ipcRenderer.invoke('initialize-installation', path).then(result => {
-      this.installationFileSubject.next(result);
-    });
+  initializeGameInstance(gamepath: string): Observable<InstallationInfo> {
+    this.es.ipcRenderer.invoke(IPCMessages.INITIALIZE_INSTANCE, gamepath).then(
+      result => this.instanceSubject.next(result),
+      err => this.instanceSubject.error(err)
+    );
 
-    return this.installationFileSubject.asObservable();
+    return this.instanceSubject.asObservable();
   }
 }

@@ -22,7 +22,6 @@ export class GamepathInputComponent implements OnDestroy {
 
   set path(p: string | null) {
     p = p || '';
-    console.log(p);
     this.group.patchValue({ 'gamepath': p });
   }
 

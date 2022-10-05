@@ -1,9 +1,9 @@
-import { Loader, InstalledAddonMetadata, Addon } from "@gw2-am/common";
-import { Manager } from "../addons.model";
+import { Loader, InstalledAddonMetadata, Addon, LoaderMetaData, Manager } from "@gw2-am/common";
 
 export interface AddonState {
     addons?: Map<string, Addon>;
     loader?: Loader;
     manager?: Manager;
-    installed?: Map<string, InstalledAddonMetadata>
+    installed?: Map<string, InstalledAddonMetadata>;
+    loaderMetadata?: LoaderMetaData;
 }

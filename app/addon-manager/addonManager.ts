@@ -2,8 +2,9 @@ import * as storage from 'electron-json-storage';
 import * as fs from 'fs-extra';
 import * as fsp from 'node:fs/promises';
 import * as path from "path";
+import * as log from 'electron-log';
 
-import { AddonManagerConfig, InitializationRequirements, InstallationInfo }  from '../../common'
+import { AddonManagerConfig, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo }  from '../../common'
 
 const MAGICFILE_FILENAME = 'gw2addonmanager';
 
@@ -15,10 +16,10 @@ export class AddonManager {
 
     public getConfig(): Promise<AddonManagerConfig> {
         const result: Promise<AddonManagerConfig> = new Promise((resolve, reject) => {
-            storage.get('config', (err, data) => {
+            storage.get('config', (err, data: AddonManagerConfig) => {
                 if (err) reject(err);
 
-                let config = (data) ? data :  { gamepath: '', local: 'en-US' };
+                let config = (Object.keys(data).length != 0) ? data :  { gamepath: '', locale: 'en-US' };
                 resolve(config);
             })
         })
@@ -39,46 +40,69 @@ export class AddonManager {
         return promise;
     }
 
+    public async readMagicFile(config: AddonManagerConfig | string = null): Promise<InstallationInfo> {
+        let gamepath = '';
 
-    public async readMagicFile(config: AddonManagerConfig = null): Promise<InstallationInfo> {
-        config = config || await this.getConfig();
+        if (typeof(config) == "string") {
+            gamepath = config;
+        }
+        else {
+            config = config || await this.getConfig();
+            gamepath = config.gamepath;
+        }
 
-        if (config.gamePath.trim() == '')
+        if (gamepath == '')
             throw new Error('Cannot read magic file when the game path is not initialized');
 
-        const filepath = path.join(config.gamePath, MAGICFILE_FILENAME);
+        const filepath = path.join(gamepath, MAGICFILE_FILENAME);
         const text = await fsp.readFile(filepath, 'utf8');
 
         return JSON.parse(text);
     }
 
-    public async requiresInitialization(): Promise<InitializationRequirements> {
-        const result: InitializationRequirements = {
-            settings: true,
-            magicFile: true,
-            loader: true
-        };
-        const config = await this.getConfig();
+    public async writeMagicFile(installationInfo: InstallationInfo, gamepath: string = null) {
+        if (!gamepath) {
+            const config = await this.getConfig();
+            gamepath = config.gamepath;
+        }
 
-        result.settings = config.gamePath.trim() == '';
+        const filepath = path.join(gamepath, MAGICFILE_FILENAME);
+        const text = JSON.stringify(installationInfo, null, 2);
+        await fsp.writeFile(filepath, text);
+    }
 
-        if (result.settings)
-            return result;
+    public async initializeInstance(gamepath): Promise<InstallationInfo> {
+        let installationInfo = null;
+        try {
+            installationInfo = await this.readMagicFile(gamepath);
+        } catch (error) {
+            // If that errored out, we need to make a new file and everything
 
-        const magicFilePath = path.join(config.gamePath, MAGICFILE_FILENAME);
-        result.magicFile = !fs.existsSync(magicFilePath);
+            installationInfo = createDefaultInstallationInfo();
+            await this.writeMagicFile(gamepath);
+        }
+        finally {      
+            return installationInfo;      
+        }
+    }
 
-        if (result.magicFile)
-            return result;
+    public async initialize(): Promise<any> {
+        const result: Promise<any> = new Promise(async (resolve, reject) => {
+            const config = await this.getConfig();
+            let installationInfo = null;
+    
+            if (config.gamepath != '') {
+                try {
+                    installationInfo = await this.readMagicFile(config);
+                }
+                catch(err) {
+                    log.info( 'We have a gamepath but no magic file, setup probably failed half-way through. Ingorring for now');
+                }
+            }
 
-        const magicFile = await this.readMagicFile(config);
+            resolve({ config, installationInfo });
+        });
 
-        /**
-         * The two !! convert magicFile.loader into false if it doesn't exist
-         * The third will change the meaning to "do we need to iniitalize this"
-         * from "Does this exist"
-         */
-        result.loader = !!!magicFile.loader;        
         return result;
     }
 }

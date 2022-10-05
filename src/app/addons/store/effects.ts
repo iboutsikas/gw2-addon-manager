@@ -6,13 +6,14 @@ import { switchMap, map, tap, catchError, bufferTime, filter, observeOn, asyncSc
 
 import { AppState } from "../../store/state";
 import * as addonActions from './actions'
+import * as appActions from '../../store/actions';
 // import { selectAllAddons } from './selectors';
 
 import { APP_CONFIG } from '../../../environments/environment'
 import { AddonService } from "../services/addon.service";
 import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
-import { APIResponse } from "../addons.model";
-import { Addon } from "@gw2-am/common";
+import { Addon, APIResponse, InstallationInfo } from "@gw2-am/common";
+import { selectGamepath } from "app/store/selectors";
 
 
 @Injectable()
@@ -34,13 +35,30 @@ export class AddonEffects {
     //         }),
     //         map(addons => addonActions.addAddonsInstalled({ updates: addons }))
     //     ));
-    setupInstallation$ = createEffect(() => this.store.select(state => state.config.gamePath).pipe(
-        filter(path => path && path.trim() !== ''),
-        observeOn(leaveZone(this.zone, asyncScheduler)),
-        switchMap(path => this.addonService.initializeInstallation(path)),
-        observeOn(enterZone(this.zone, queueScheduler))
-    ), { dispatch: false });
     
+    // setupInstallation$ = createEffect(() => this.store.select(state => state.config.gamePath).pipe(
+    //     filter(path => path && path.trim() !== ''),
+    //     observeOn(leaveZone(this.zone, asyncScheduler)),
+    //     switchMap(path => this.addonService.initializeInstallation(path)),
+    //     observeOn(enterZone(this.zone, queueScheduler))
+    // ), { dispatch: false });
+
+    thingy$ = createEffect(() => this.store.select(selectGamepath).pipe(
+        filter(gamepath => gamepath.trim() != ''),
+        observeOn(leaveZone(this.zone, asyncScheduler)),
+        map(gamepath => this.addonService.initializeGameInstance(gamepath)),
+        observeOn(enterZone(this.zone, queueScheduler)),
+        tap((installationInfo) => {
+            console.log(installationInfo)
+        })
+    ), {dispatch: false});
+    
+
+    fetchAddonsOnInit$ = createEffect(() => this.actions$.pipe(
+        ofType(appActions.appInitialize),
+        map(_ => addonActions.fetchAddons())
+    ));
+
     // Typescript is losing it's mind over the types here, so we tell it to pipe down
     // @ts-ignore
     fetchAddons$ = createEffect(() => this.actions$.pipe(

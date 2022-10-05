@@ -1,3 +1,5 @@
+import { Addon } from "./addons/addon-interfaces";
+
 export interface InitializationRequirements {
     settings: Boolean,
     magicFile: Boolean,
@@ -5,7 +7,7 @@ export interface InitializationRequirements {
 }
 
 export interface AddonManagerConfig {
-    gamePath: string;
+    gamepath: string;
     locale: string;
 }
 
@@ -19,3 +21,19 @@ export interface Loader
     wrapper_nickname: string;
 }
 
+export interface Manager
+{
+    name: string;
+    developer: string;
+    website: string;
+    version_id: string;
+    download_url: string;
+}
+
+
+export interface APIResponse 
+{
+    addons: Map<string, Addon>;
+    loader: Loader;
+    manager: Manager;
+};

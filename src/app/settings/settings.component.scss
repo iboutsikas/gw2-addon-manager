@@ -1,87 +1,11 @@
 :host {
     display: block;
+
     h1 {
         margin-bottom: 0.5em;
     }
 
-    form {
-        display: flex;
-        flex-direction: column;
-        
-        .form-buttons {
-            display: flex;
-            margin-top: 2em;
-
-            button {
-                margin-right: 1em;
-            }
-        }
-    }
-
-    .settings-button {
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        line-height: 2rem;
-        font-size: 1rem;
-
-        border: 1px solid rgba(0, 0, 0, 0.25);
-        background-color: var(--app-color-primary);
-        flex-basis: 10%;
-        color: white;
-
-        &:hover {
-            background-color: adjust-color(#29ADC1, $lightness: 10%);
-            border-color: adjust-color(#29ADC1, $lightness: 10%);
-        }
-
-        &:active {
-            background-color: adjust-color(#29ADC1, $lightness: -10%);
-            border-color: adjust-color(#29ADC1, $lightness: -10%)
-        }
-
-        &:disabled {
-            background-color: gray;
-            color: black;
-            border-color: gray;
-        }
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-
-        &>.form-control {
-            display: flex;
-
-            
-
-            &>input {
-                border: 1px solid rgba(0, 0, 0, 0.25);
-                border-right: none;
-                flex: 1;
-                padding: 0 0.75em 0 0.75em;
-
-                &:focus {
-                    border-color: var(--app-color-primary);
-                    border-width: 2px;
-                }
-
-                &:focus,
-                &:focus-visible {
-                    outline: none;
-                }
-            }
-        }
-
-        .error-messages {
-            display: flex;
-            flex-direction: column;
-
-            span {
-                color: var(--app-color-accent);
-            }
-        }
+    .action-buttons {
+        margin-top: 1em;
     }
 }

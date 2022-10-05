@@ -1,35 +1,11 @@
-<form [formGroup]="settingsForm" (ngSubmit)="onSaveSettings()">
-    <h1 class="mat-display-1">
-        {{ 'GLOBALS.PREFERENCES' | translate }}
-    </h1>
+<h1 class="mat-display-1">
+    {{ 'GLOBALS.PREFERENCES' | translate }}
+</h1>
 
-    <div class="form-group">
-        <label for="game-path">{{ 'GLOBALS.GAMEPATH' | translate }}</label>
-        <div class="form-control">
-            <input id="game-path" type="text" formControlName="gamePath"/>
-            <button class="settings-button">
-                <mat-icon>folder</mat-icon>
-                Browse
-            </button>
-        </div>
-        <div *ngIf="settingsForm.controls['gamePath'].invalid && (settingsForm.controls['gamePath'].dirty || settingsForm.controls['gamePath'].touched)" class="error-messages">
-            <span *ngIf="settingsForm.controls['gamePath'].errors.invalidPath">{{ 'COMPONENTS.SETTINGS.INVALID_PATH' | translate }}</span>
-            <span *ngIf="settingsForm.controls['gamePath'].errors.doesNotExist">{{ 'COMPONENTS.SETTINGS.MISSING_PATH' | translate }}</span>
-            <span *ngIf="settingsForm.controls['gamePath'].errors.noExe">{{ 'COMPONENTS.SETTINGS.MISSING_EXE' | translate }}</span>
-        </div>
-    </div>
+<app-gamepath-input [path]="gamepath$ | async" (pathChanged)="onPathChanged($event)"></app-gamepath-input>
 
-    <div class="form-buttons">
-        <button routerLink="/" mat-stroked-button color="primary">
-            {{ 'COMPONENTS.SETTINGS.BACK' | translate}}
-        </button>
-        <button
-        mat-flat-button color="primary" 
-        [disabled]="!settingsForm.valid"
-        type="submit">
-            {{ 'COMPONENTS.SETTINGS.SAVE' | translate}}
-        </button>
-    </div>
-
-    
-</form>
+<div class="action-buttons">
+    <button routerLink="/addons" mat-stroked-button color="primary">
+        {{ 'COMPONENTS.SETTINGS.BACK' | translate}}
+    </button>
+</div>

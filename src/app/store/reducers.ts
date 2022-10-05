@@ -3,7 +3,7 @@ import { AppConfig } from './state';
 import * as actions from './actions';
 
 const initialState: AppConfig = {
-    gamePath: '',
+    gamepath: '',
     locale: 'en-US'
 };
 
