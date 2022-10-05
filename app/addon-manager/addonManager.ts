@@ -79,7 +79,7 @@ export class AddonManager {
             // If that errored out, we need to make a new file and everything
 
             installationInfo = createDefaultInstallationInfo();
-            await this.writeMagicFile(gamepath);
+            await this.writeMagicFile(installationInfo, gamepath);
         }
         finally {      
             return installationInfo;      

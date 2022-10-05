@@ -1,10 +1,10 @@
 import { Injectable, NgZone } from "@angular/core";
-import { asyncScheduler, bufferTime, debounceTime, filter, map, observeOn, queueScheduler, shareReplay, switchMap, tap } from 'rxjs';
+import { asyncScheduler, debounceTime, filter, map, observeOn, queueScheduler, shareReplay, switchMap, tap } from 'rxjs';
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { Store } from "@ngrx/store";
 import * as appActions from './actions';
 
-import { AppConfig, AppState } from "./state";
+import { AppState } from "./state";
 import { ElectronService } from "../core/services";
 import { TranslateService } from "@ngx-translate/core";
 import { enterZone, leaveZone } from "app/shared/utils/zone.scheduler";
@@ -12,13 +12,12 @@ import { AddonService } from "app/addons/services/addon.service";
 import { Router } from "@angular/router";
 import { AddonManagerConfig } from "../../../common/shared-interfaces";
 import { InstallationInfo } from "../../../common/addons/addon-interfaces";
-import { create } from "domain";
 import { selectAppConfig, selectLocale } from "./selectors";
 
 @Injectable()
-export class ConfigEffects {
+export class AppEffects {
 
-    appInitialize$ = createEffect(() => this.actions$.pipe(
+    public appInitialize$ = createEffect(() => this.actions$.pipe(
         ofType(appActions.appInitialize),
         observeOn(leaveZone(this.zone, asyncScheduler)),
         switchMap(_ => this.electronService.initializeAppBackend()),
@@ -42,11 +41,6 @@ export class ConfigEffects {
     appDoesNotHaveConfig$ = createEffect(() => this.appInitialize$.pipe(
         filter((result: {config: AddonManagerConfig, installationInfo: InstallationInfo | null}) => result.config.gamepath == ''),
         map(_ => this.router.navigateByUrl("/settings"))
-    ), {dispatch: false});
-
-    appHasInstallationInfo$ = createEffect(() => this.appInitialize$.pipe(
-        filter((result: {config: AddonManagerConfig, installationInfo: InstallationInfo | null}) => result.installationInfo != null),
-        map(value => value.installationInfo)        
     ), {dispatch: false});
 
     writeConfig$ = createEffect(() => this.actions$.pipe(

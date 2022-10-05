@@ -1,4 +1,4 @@
-import { Addon,Loader, Manager } from '@gw2-am/common';
+import { Addon,InstallationInfo,Loader, Manager } from '@gw2-am/common';
 import { createAction, props } from '@ngrx/store';
 
 
@@ -20,6 +20,11 @@ export const updateAddonsStatus = createAction(
 export const updateAddonsStatusEnd = createAction(
     '[Addons] Update addons status end',
     props<{ updates: Map<string, Addon> }>()
+)
+
+export const updateInstallationInfo = createAction (
+    '[Addons] Update installation info',
+    props<{ info: InstallationInfo }>()
 )
 
 export const fetchAddons = createAction(

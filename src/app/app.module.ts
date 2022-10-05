@@ -32,7 +32,7 @@ import { APP_CONFIG as environment } from '../environments/environment';
 import { configReducer } from './store/reducers';
 import { AddonsModule } from './addons/addons.module';
 import { SettingsComponent } from './settings/settings.component';
-import { ConfigEffects } from './store/effects';
+import { AppEffects } from './store/effects';
 import { LoadingPageComponent } from './loading-page/loading-page.component';
 
 // AoT requires an exported function for factories
@@ -65,7 +65,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new Transla
       }
     }),
     StoreModule.forRoot({ config: configReducer }, {}),
-    EffectsModule.forRoot([ConfigEffects]),
+    EffectsModule.forRoot([AppEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],
   providers: [],

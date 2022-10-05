@@ -4,9 +4,9 @@ import { AppState } from "../../store/state";
 
 export const selectAddonsFeature = (state: AppState) => state.addons;
 
-export const selectLoader = createSelector(
+export const selectLoaderMetadata = createSelector(
     selectAddonsFeature,
-    (feature) => feature.loader
+    (feature) => feature.loaderMetadata
 )
 
 export const selectAllAddons = createSelector(

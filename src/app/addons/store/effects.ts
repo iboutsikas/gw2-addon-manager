@@ -12,12 +12,15 @@ import * as appActions from '../../store/actions';
 import { APP_CONFIG } from '../../../environments/environment'
 import { AddonService } from "../services/addon.service";
 import { enterZone, leaveZone } from "../../shared/utils/zone.scheduler";
-import { Addon, APIResponse, InstallationInfo } from "@gw2-am/common";
+import { Addon, AddonManagerConfig, APIResponse, InstallationInfo } from "@gw2-am/common";
 import { selectGamepath } from "app/store/selectors";
+import { AppEffects } from "app/store/effects";
 
 
 @Injectable()
 export class AddonEffects {
+
+
 
     // installationFile$ = createEffect(() => 
     //     this.store.select(state => state.config.gamePath).pipe(
@@ -43,15 +46,19 @@ export class AddonEffects {
     //     observeOn(enterZone(this.zone, queueScheduler))
     // ), { dispatch: false });
 
-    thingy$ = createEffect(() => this.store.select(selectGamepath).pipe(
+    initializeInstance$ = createEffect(() => this.store.select(selectGamepath).pipe(
         filter(gamepath => gamepath.trim() != ''),
         observeOn(leaveZone(this.zone, asyncScheduler)),
-        map(gamepath => this.addonService.initializeGameInstance(gamepath)),
+        switchMap(gamepath => this.addonService.initializeGameInstance(gamepath)),
         observeOn(enterZone(this.zone, queueScheduler)),
-        tap((installationInfo) => {
-            console.log(installationInfo)
-        })
-    ), {dispatch: false});
+        map(info => addonActions.updateInstallationInfo({ info }))
+    ));
+
+    // appHasInstallationInfo$ = createEffect(() => this.appEffects.appInitialize$.pipe(
+    //     filter((result: {config: AddonManagerConfig, installationInfo: InstallationInfo | null}) => result.installationInfo != null),
+    //     map(value => value.installationInfo),
+    //     map(info => addonActions.updateInstallationInfo({ info }))  
+    // ));
     
 
     fetchAddonsOnInit$ = createEffect(() => this.actions$.pipe(
@@ -150,6 +157,7 @@ export class AddonEffects {
         private actions$: Actions,
         private addonService: AddonService,
         private zone: NgZone,
-        private store: Store<AppState>
+        private store: Store<AppState>,
+        private appEffects: AppEffects
     ) { }
 }

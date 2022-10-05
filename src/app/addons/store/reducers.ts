@@ -50,6 +50,9 @@ export const addonsReducer = createReducer(
     //     });
     //     return { ...state, installedAddons: newAddons };
     // }),
+    on(actions.updateInstallationInfo, (state, { info }) => {
+        return { ...state, installed: info.addons, loaderMetadata: info.loader }
+    }),
     on(actions.fetchAddonsSuccess, (state, { addons, loader }) => {
         return { ...state, addons: addons, loader: loader };
     }),
