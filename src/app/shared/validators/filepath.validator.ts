@@ -25,7 +25,8 @@ export class FilePathValidator {
         if (!pathExists)
             return { doesNotExist: control.value };
 
-        const correctExe = this.electronService.fs.existsSync(`${control.value}/Gw2-64.exe`);
+        const correctExe = this.electronService.fs.existsSync(`${control.value}/Gw2-64.exe`) 
+                    || this.electronService.fs.existsSync(`${control.value}/GW2-64.exe`);
 
         return correctExe ? null : { noExe: control.value };
     }
