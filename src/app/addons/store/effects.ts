@@ -54,7 +54,7 @@ export class AddonEffects {
     // @ts-ignore
     fetchAddons$ = createEffect(() => this.actions$.pipe(
         ofType(addonActions.fetchAddons),
-        switchMap(_ => this.http.get<APIResponse>('assets/test-data.json').pipe(
+        switchMap(_ => this.http.get<APIResponse>('https://gw2-addon-loader.github.io/addon-repo/addons.json').pipe(
             map((res: APIResponse) => addonActions.fetchAddonsSuccess({ addons: res.addons, loaderDownloadData: res.loader })),
             catchError(err => addonActions.fetchAddonsFailure(err))
         ))

@@ -6,7 +6,7 @@ import * as path from 'path';
 
 
 import { AddonInstallationPaths } from "../interfaces/general-interfaces";
-import { Addon } from '../../common';
+import { Addon } from '../common';
 
 
 export class AddonInstaller {

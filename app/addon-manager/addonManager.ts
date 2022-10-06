@@ -9,9 +9,10 @@ import * as semver from 'semver';
 
 import { app } from 'electron';
 
-import { Addon, AddonManagerConfig, AddonStatus, createDefaultInstallationInfo, InitializationRequirements, InstallationInfo, InstalledAddonMetadata, Loader } from '../../common'
 import { AddonInstaller } from '../addons/addonInstaller';
 import { AddonInstallationPaths } from '../interfaces/general-interfaces';
+import { Addon, AddonManagerConfig, AddonStatus, createDefaultInstallationInfo, InstallationInfo, InstalledAddonMetadata, Loader } from '../common';
+// import { AddonManagerConfig, InstallationInfo, createDefaultInstallationInfo, Addon, Loader, InstalledAddonMetadata, AddonStatus } from '../../common';
 
 const MAGICFILE_FILENAME = 'gw2addonmanager';
 

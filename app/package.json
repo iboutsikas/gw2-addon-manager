@@ -1,12 +1,12 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "name": "gw2-addon-manager",
+  "description": "An addon manager for Guild Wars 2",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Ioannis Boutsikas",
+    "email": "mgioanni@outlook.com"
   },
-  "version": "11.1.0",
-  "main": "dist/out-tsc/app/main.js",
+  "version": "0.1.0",
+  "main": "electron_main.js",
   "private": true,
   "devDependencies": {
     "electron-devtools-installer": "^3.2.0"

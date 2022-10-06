@@ -1,14 +1,15 @@
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as fsp from 'node:fs/promises';
 import * as storage from 'electron-json-storage';
-import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+// import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
-import { AddonManagerConfig } from '../common';
-import { IPCMessages } from '../common';
+import * as log from 'electron-log';
+
+// import { AddonManagerConfig, IPCMessages } from '@gw2-am/common';
 
 import { Instance as manager }  from './addon-manager/addonManager';
+import { AddonManagerConfig, IPCMessages } from './common';
 
 
 let win: BrowserWindow = null;
@@ -45,12 +46,15 @@ function createWindow(): BrowserWindow {
     // Path when running electron executable
     let pathIndex = './index.html';
 
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+    if (fs.existsSync(path.join(__dirname, '../index.html'))) {
       // Path when running electron in local folder
-      pathIndex = '../dist/index.html';
+      pathIndex = '../index.html';
     }
 
-    const url = new URL(path.join('file:', __dirname, pathIndex));
+    const filename = path.join('file:', __dirname, pathIndex);
+
+    const url = new URL(filename);
+    // const url = new URL("https://www.google.com");
     win.loadURL(url.href);
   }
 
@@ -140,12 +144,17 @@ try {
   });
 
   app.whenReady().then(() => {
-    installExtension(REDUX_DEVTOOLS)
-      .then((name) => console.log(`Added Extension:  ${name}`))
-      .catch((err) => console.log('An error occurred: ', err));
+    // if (serve) 
+    // {
+    //   installExtension(REDUX_DEVTOOLS)
+    //   .then((name) => console.log(`Added Extension:  ${name}`))
+    //   .catch((err) => console.log('An error occurred: ', err));
+    // }    
+    // win.webContents.openDevTools();
   });
 
 } catch (e) {
   // Catch Error
   // throw e;
+  log.error(`Uncaught exception: ${e}`)
 }

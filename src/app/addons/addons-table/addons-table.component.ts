@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Addon, HashMap } from '@gw2-am/common';
+
+
 import { Store } from '@ngrx/store';
 import { AppState } from 'app/store/state';
+import { Addon, HashMap } from '../../../../common/addons/addon-interfaces';
 
 import * as addonActions from '../store/actions'
 

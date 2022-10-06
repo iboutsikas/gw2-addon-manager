@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map, Observable, shareReplay, tap } from 'rxjs';
+import { map, Observable, shareReplay } from 'rxjs';
 
 import { AddonService } from '../services/addon.service';
 import { selectAvailableAddons, selectInstalledAddons } from '../store/selectors';
 import { AppState } from '../../store/state';
-import * as addonActions from '../store/actions';
-import { Addon } from '@gw2-am/common';
 
 @Component({
   selector: 'app-addons-main',
