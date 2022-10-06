@@ -1,6 +1,6 @@
 {
   "name": "gw2-addon-manager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AddOn manager for Guild Wars 2",
   "homepage": "https://github.com/iboutsikas/gw2-addon-manager",
   "author": {

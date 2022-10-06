@@ -5,7 +5,7 @@
     "name": "Ioannis Boutsikas",
     "email": "mgioanni@outlook.com"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/electron_main.js",
   "private": true,
   "devDependencies": {
