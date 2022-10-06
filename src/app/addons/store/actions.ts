@@ -18,6 +18,36 @@ export const installAddonsFail = createAction(
     props<{ addonKeys: string[] }>()
 )
 
+export const uninstallAddons = createAction(
+    '[Addons] Uninstall addons',
+    props<{ addonsToUninstall: HashMap<Addon> }>()
+)
+
+export const uninstallAddonsSuccess = createAction(
+    '[Addons] Uninstall addons success',
+    props<{ addonKeys: string[] }>()
+)
+
+export const fetchAddons = createAction(
+    '[Addons] Fetch addons'
+)
+
+export const fetchAddonsSuccess = createAction (
+    '[Addons] Fetch addons success',
+    props<AddonState>()
+)
+
+export const fetchAddonsFailure = createAction (
+    '[Addons] Fetch addons fail',
+    props<any>()
+)
+
+
+
+
+
+
+
 export const removeAddonsInstalled = createAction(
     '[Addons] Remove installed addons',
     props<{ updates: HashMap<Addon> }>()
@@ -38,16 +68,3 @@ export const updateInstallationInfo = createAction (
     props<{ info: InstallationInfo }>()
 )
 
-export const fetchAddons = createAction(
-    '[Addons] Fetch addons'
-)
-
-export const fetchAddonsSuccess = createAction (
-    '[Addons] Fetch addons success',
-    props<AddonState>()
-)
-
-export const fetchAddonsFailure = createAction (
-    '[Addons] Fetch addons fail',
-    props<any>()
-)

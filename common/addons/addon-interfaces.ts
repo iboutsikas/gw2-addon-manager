@@ -38,6 +38,9 @@ export interface Addon {
     version_id_is_human_readable: boolean;
     download_url: string;
     being_processed?: boolean;
+    files? : string[];
+    plugin_name_pattern?: string;
+    plugin_name?: string;
 }
 
 export interface HashMap<TValue> {

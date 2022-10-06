@@ -95,6 +95,34 @@ export class AddonEffects {
         map(keys => addonActions.installAddonsFail({ addonKeys: keys}))
     ))
 
+    uninstallAddons$ = this.actions$.pipe(
+        ofType(addonActions.uninstallAddons),
+        map(action => action.addonsToUninstall),
+        bufferDebounce(2 * 1000),
+        filter(installations => installations.length !== 0),
+        map((installations: HashMap<Addon>[]) => {
+            // Here we want to combine all of the hash maps
+            // into a single hash map. This will remove all duplicates
+            let result = {};
+            for (let installation of installations) {
+                Object.keys(installation).forEach(key => {
+                    result[key] = installation[key];
+                })
+            }
+            return result;
+        }),
+        // Now map them into an array of objects
+        map(installations => Object.keys(installations).map(key => installations[key])),
+        observeOn(leaveZone(this.zone, asyncScheduler)),
+        switchMap((addons) => this.addonService.uninstallAddons(addons)),
+        observeOn(enterZone(this.zone, queueScheduler)),
+        shareReplay()
+    )
+
+    uninstallAddonsSuccess$ = createEffect(() => this.uninstallAddons$.pipe(
+        map((keys: string[]) => addonActions.uninstallAddonsSuccess({ addonKeys: keys }))
+    ));
+
 
     // @ts-ignore
     // updateStatus$ = createEffect(() => this.actions$.pipe(

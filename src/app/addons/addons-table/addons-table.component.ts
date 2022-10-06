@@ -34,11 +34,10 @@ export class AddonsTableComponent implements OnInit {
   }
 
   onUninstallClicked(addon: Addon): void {
-    console.log(addon)
-    // const thing: AddonHashMap = { };
-    // thing[addon.id] = { id: addon.id, name: addon.name, version:addon.latestVersion, status: addon.status }
+    const payload: HashMap<Addon> = {}
+    payload[addon.nickname] = addon;
     
-    // this.store.dispatch(addonActions.removeAddonsInstalled({ updates: thing } ))
+    this.store.dispatch(addonActions.uninstallAddons({ addonsToUninstall: payload }));
   }
 
   onDisableClicked(addon: Addon): void {

@@ -77,4 +77,43 @@ export class AddonInstaller {
 
         await fs.copy(sourcepath, paths.installation, { recursive: true })
     }
+
+    public async uninstallAddon(addon: Addon, paths: AddonInstallationPaths) {
+        const isArcPlugin = addon.install_mode == 'arc';
+
+        const files = addon.files || [];
+
+        for (let file of files) {
+            const filepath = path.join(paths.installation, file);
+            try {
+                log.info(`[AddonInstaller] Deleting ${filepath}`);
+                await fsp.unlink(filepath);
+            }
+            catch(err) {
+                log.warn(`[AddonInstaller] Could not delete ${filepath}`);
+            }
+        }
+
+        if (isArcPlugin) {
+            const files = await fsp.readdir(paths.installation);
+            for (let file of files) {
+                const filepath = path.join(paths.installation, file);
+                const filepattern = addon.plugin_name 
+                                || addon.plugin_name_pattern.slice(0, -1)
+                                || '';
+                if (filepath.includes(filepattern)) {
+                    await fsp.unlink(filepath);
+                }
+            }
+        }
+        else {
+            // else just delete the folder
+            try {
+                await fsp.rm(paths.installation, {recursive: true});
+            }
+            catch (err) {
+                log.error(err);
+            }
+        }
+    }
 }

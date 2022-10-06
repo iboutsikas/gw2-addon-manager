@@ -81,7 +81,23 @@ export const addonsReducer = createReducer(
             newAddons[key] = {...newAddons[key], being_processed: false}
         }
         return { ...state, addons: newAddons }
+    }),
+    on(actions.uninstallAddons, (state, action) => {
+        let newAddons = { ...state.addons };
+
+        Object.keys(action.addonsToUninstall).forEach(key => {
+            newAddons[key] = {...state.addons[key], being_processed: true };
+        });
+        return { ...state, addons: newAddons }
+    }),
+    on(actions.uninstallAddonsSuccess, (state, action) => {
+        let newAddons = { ...state.addons };
+        let installed = { ...state.installed };
+
+        for (let key of action.addonKeys) {
+            newAddons[key] = {...newAddons[key], being_processed: false}
+            delete installed[key];
+        }
+        return { ...state, addons: newAddons, installed: installed };
     })
-
-
 )

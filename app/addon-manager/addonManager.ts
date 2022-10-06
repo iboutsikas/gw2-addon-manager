@@ -197,6 +197,32 @@ export class AddonManager {
         return { successes : metadata, failures: failures.map(a => a.nickname )}
     }
 
+    public async uninstallAddons(addons: Addon[]) {
+        const config = await this.getConfig();
+        // TODO: Lock this somehow so no parallel shenanigans
+        const installationInfo = await this.readMagicFile(config);
+
+        const installer = new AddonInstaller(config.gamepath);
+        const successes = [];
+
+        for (let addon of addons) {
+            const isArcPlugin = addon.install_mode == 'arc';
+            const installationPath = isArcPlugin ?
+                path.join(config.gamepath, 'addons', 'arcdps') : 
+                path.join(config.gamepath, 'addons', addon.nickname);
+            
+            let paths: AddonInstallationPaths = {};
+            paths.installation = installationPath;
+            installer.uninstallAddon(addon, paths);
+
+            delete installationInfo.addons[addon.nickname];
+            successes.push(addon.nickname);
+        }
+
+        await this.writeMagicFile(installationInfo, config.gamepath);
+        return successes;
+    }
+
     private async installOrUpdateLoader(gamepath: string, installationInfo: InstallationInfo, loader: Loader) {
         let needsUpdate = !!!installationInfo.loader;
         if (installationInfo.loader) {

@@ -1,24 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, NgZone } from '@angular/core';
-import { map, tap, switchMap, forkJoin, Subscription, filter, share, Observable, Subject, timer } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { ElectronService } from '../../core/services';
 import { AppState } from '../../store/state';
 import { Store } from '@ngrx/store';
 import * as addonActions from '../store/actions';
 
-import { APP_CONFIG } from '../../../environments/environment'
-import { Addon, InstallationInfo, Loader } from '@gw2-am/common';
-import { IPCMessages } from '../../../../app/dist/out-tsc/common/ipcMessages';
+import { Addon, InstallationInfo, IPCMessages, Loader } from '@gw2-am/common';
 
-// interface InstallationInformation {
-//   version: number;
-//   installedAddons: AddonFromJSON[];
-// }
-
-// export interface StatusUpdateReply {
-//   succeeded: AddonDescription[];
-//   failed: AddonDescription[];
-// };
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +15,9 @@ export class AddonService {
 
   private statusUpdatesSubject: Subject<any> = new Subject();
   private installAddonsSubject: Subject<any> = new Subject();
+  private uninstallAddonsSubject: Subject<any> = new Subject();
   private instanceSubject: Subject<any> = new Subject();
+
   constructor(
     private es: ElectronService,
     private store: Store<AppState>
@@ -45,6 +35,14 @@ export class AddonService {
 
 
     return this.installAddonsSubject.asObservable();
+  }
+
+  public uninstallAddons(addons: Addon[]): Observable<any> {
+    this.es.ipcRenderer.invoke(IPCMessages.UNINSTALL_ADDONS, addons).then(result => {
+      this.uninstallAddonsSubject.next(result);
+    });
+    
+    return this.uninstallAddonsSubject.asObservable();
   }
 
   public updateAddonsStatus(changes): Observable<any> {

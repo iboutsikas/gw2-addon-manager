@@ -127,8 +127,11 @@ try {
   });
 
   ipcMain.handle(IPCMessages.INSTALL_ADDONS, async (event, addons, loader) => {
-    
     return await manager.installAddons(addons, loader);
+  })
+
+  ipcMain.handle(IPCMessages.UNINSTALL_ADDONS, async (event, addons) => {
+    return await manager.uninstallAddons(addons);
   })
 
   ipcMain.handle(IPCMessages.OPEN_FILE_DIALOG, async (event, p) => {
