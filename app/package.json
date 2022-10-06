@@ -6,7 +6,7 @@
     "email": "mgioanni@outlook.com"
   },
   "version": "0.1.0",
-  "main": "electron_main.js",
+  "main": "dist/electron_main.js",
   "private": true,
   "devDependencies": {
     "electron-devtools-installer": "^3.2.0"

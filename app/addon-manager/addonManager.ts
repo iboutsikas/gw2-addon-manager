@@ -185,6 +185,10 @@ export class AddonManager {
                 status: AddonStatus.ENABLED,
                 version: addon.version_id
             }
+
+            if (addon.install_mode == 'arc') {
+                newMetadata.plugin_type = 'arc';
+            }
             
             installationInfo.addons[addon.nickname] = newMetadata;
             metadata.push(newMetadata);
@@ -205,12 +209,16 @@ export class AddonManager {
 
         const installer = new AddonInstaller(config.gamepath);
         const successes = [];
+        let oneOfTheAddonsWasArc = false;
 
         for (let addon of addons) {
             const isArcPlugin = addon.install_mode == 'arc';
             const installationPath = isArcPlugin ?
                 path.join(config.gamepath, 'addons', 'arcdps') : 
                 path.join(config.gamepath, 'addons', addon.nickname);
+
+            if (addon.nickname == 'arcdps')
+                oneOfTheAddonsWasArc = true;
             
             let paths: AddonInstallationPaths = {};
             paths.installation = installationPath;
@@ -219,7 +227,21 @@ export class AddonManager {
             delete installationInfo.addons[addon.nickname];
             successes.push(addon.nickname);
         }
+        if (oneOfTheAddonsWasArc) {
+            // We need to first find the keys and then delete them. Modifying the keys while
+            // also iterating them is a bad idea
+            const keysToDelete = []
+            Object.keys(installationInfo.addons).forEach(key => {
+                if (installationInfo.addons[key].plugin_type && installationInfo.addons[key].plugin_type == 'arc') {
+                    keysToDelete.push(key)
+                    successes.push(key)
+                }
+            })
 
+            for (let key of keysToDelete) {
+                delete installationInfo.addons[key];
+            }
+        }
         await this.writeMagicFile(installationInfo, config.gamepath);
         return successes;
     }

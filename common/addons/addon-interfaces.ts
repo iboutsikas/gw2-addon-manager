@@ -6,7 +6,8 @@ export enum AddonStatus {
 export interface InstalledAddonMetadata {
     name: string;
     version: string;
-    status: AddonStatus
+    status: AddonStatus,
+    plugin_type?: string;
 }
 
 export interface LoaderMetaData {
