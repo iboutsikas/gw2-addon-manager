@@ -16,6 +16,7 @@ export class AddonService {
   private statusUpdatesSubject: Subject<any> = new Subject();
   private installAddonsSubject: Subject<any> = new Subject();
   private uninstallAddonsSubject: Subject<any> = new Subject();
+  private updateAddonsSubject: Subject<any> = new Subject();
   private instanceSubject: Subject<any> = new Subject();
 
   constructor(
@@ -45,6 +46,12 @@ export class AddonService {
     return this.uninstallAddonsSubject.asObservable();
   }
 
+  public updateAddons(addons: Addon[]): Observable<any> {
+    this.es.ipcRenderer.invoke(IPCMessages.UPDATE_ADDONS, addons).then(result => {
+      this.updateAddonsSubject.next(result);
+    })
+    return this.updateAddonsSubject.asObservable();
+  }
   public updateAddonsStatus(changes): Observable<any> {
     this.es.ipcRenderer.invoke('update-addon-status', changes).then(result => {
       // this.statusUpdatesSubject.next(result);

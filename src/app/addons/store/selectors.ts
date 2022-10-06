@@ -1,6 +1,8 @@
 import { createSelector } from "@ngrx/store";
 import { tap } from "rxjs";
 import { AppState } from "../../store/state";
+import * as semver from 'semver';
+import { Addon, HashMap, InstallationInfo, InstalledAddonMetadata } from "@gw2-am/*";
 
 export const selectAddonsFeature = (state: AppState) => state.addons;
 
@@ -27,8 +29,25 @@ export const selectInstalledInfo = createSelector(
 export const selectInstalledAddons = createSelector(
     selectAllAddons,
     selectInstalledInfo,
-    (addons, info) => {
-        return Object.keys(info).map(key => addons[key]);
+    (addons: HashMap<Addon>, info: HashMap<InstalledAddonMetadata>) => {
+        const result = [];
+
+        Object.keys(info).forEach(key => {
+            const addon = { ...addons[key] };
+
+            if (!addon.version_id_is_human_readable) {
+                addon.needs_update = addon.version_id != info[key].version;
+            }
+            else {
+                const cleanA = semver.clean(addon.version_id);
+                const cleanB = semver.clean(info[key].version);
+                addon.needs_update = semver.gt(cleanA, cleanB);
+            }
+            addon.installed_version = info[key].version;
+            addon.status = info[key].status;
+            result.push(addon);
+        });
+        return result;
     }
 )
 

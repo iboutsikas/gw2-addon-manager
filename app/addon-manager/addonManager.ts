@@ -122,14 +122,13 @@ export class AddonManager {
         return result;
     }
 
-    public async installAddons(addons: Addon[], loader: Loader) {
+    public async installAddons(addons: Addon[], loader?: Loader) {
         const config = await this.getConfig();
 
         // TODO: Lock this somehow so no parallel shenanigans
         const installationInfo = await this.readMagicFile(config);
 
-        try {
-
+        if (loader) {
             const didUpdate = await this.installOrUpdateLoader(config.gamepath, installationInfo, loader);
 
             if (didUpdate) {
@@ -141,10 +140,7 @@ export class AddonManager {
                 await this.writeMagicFile(installationInfo, config.gamepath);
             }
         }
-        catch (err) {
-            log.error(`[AddonManager] Failed to install or update loader: ${err}`)
-            return { successes: [], failures: addons.map(a => a.nickname)}
-        }
+
 
         const tmpPath = app.getPath("temp");
         const installer = new AddonInstaller(config.gamepath);
@@ -257,26 +253,29 @@ export class AddonManager {
             return false;
         }
 
-        log.info('[AddonManager] Need to update addon loader');
-        const tmpPath = app.getPath("temp");
+            log.info('[AddonManager] Need to update addon loader');
+            const tmpPath = app.getPath("temp");
+            try {
+            const downloadPath = path.join(tmpPath, loader.wrapper_nickname);
+            await download(loader.download_url, downloadPath);
+            log.info(`Saved file at: ${downloadPath}`);
 
-        const downloadPath = path.join(tmpPath, loader.wrapper_nickname);
-        await download(loader.download_url, downloadPath);
-        log.info(`Saved file at: ${downloadPath}`);
+            const archiveName = path.basename(loader.download_url);
+            const archivePath = path.join(downloadPath, archiveName);
 
-        const archiveName = path.basename(loader.download_url);
-        const archivePath = path.join(downloadPath, archiveName);
+            let zip = new admzip(archivePath);
 
-        let zip = new admzip(archivePath);
+            const extractPath = `${downloadPath}_unzipped`;
+            log.info(`Extracting ${archivePath} to ${extractPath}`);
+            await zip.extractAllTo(extractPath);
 
-        const extractPath = `${downloadPath}_unzipped`;
-        log.info(`Extracting ${archivePath} to ${extractPath}`);
-        await zip.extractAllTo(extractPath);
-
-        const files = await fsp.readdir(extractPath);
-
-        await fs.copy(extractPath, gamepath, { overwrite: true, recursive: true })
-        return true;
+            await fs.copy(extractPath, gamepath, { overwrite: true, recursive: true })
+            return true;
+        }
+        catch (err) {
+            log.error(`[AddonManager] Failed to install or update loader: ${err}`)
+            return false;
+        }
     }
 }
 

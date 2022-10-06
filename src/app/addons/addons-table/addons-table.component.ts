@@ -56,4 +56,8 @@ export class AddonsTableComponent implements OnInit {
     // this.store.dispatch(addonActions.updateAddonsStatus({ updates: thing } ))
   }
 
+  onUpdateClicked(addon: Addon): void {
+    this.store.dispatch(addonActions.updateAddon({ addon }));
+  }
+
 }

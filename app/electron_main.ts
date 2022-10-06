@@ -2,11 +2,9 @@ import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as storage from 'electron-json-storage';
-// import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 import * as log from 'electron-log';
-
-// import { AddonManagerConfig, IPCMessages } from '@gw2-am/common';
 
 import { Instance as manager }  from './addon-manager/addonManager';
 import { AddonManagerConfig, IPCMessages } from './common';
@@ -54,7 +52,6 @@ function createWindow(): BrowserWindow {
     const filename = path.join('file:', __dirname, pathIndex);
 
     const url = new URL(filename);
-    // const url = new URL("https://www.google.com");
     win.loadURL(url.href);
   }
 
@@ -134,6 +131,10 @@ try {
     return await manager.installAddons(addons, loader);
   })
 
+  ipcMain.handle(IPCMessages.UPDATE_ADDONS, async(event, addons) => {
+    return await manager.installAddons(addons);
+  })
+
   ipcMain.handle(IPCMessages.UNINSTALL_ADDONS, async (event, addons) => {
     return await manager.uninstallAddons(addons);
   })
@@ -144,12 +145,12 @@ try {
   });
 
   app.whenReady().then(() => {
-    // if (serve) 
-    // {
-    //   installExtension(REDUX_DEVTOOLS)
-    //   .then((name) => console.log(`Added Extension:  ${name}`))
-    //   .catch((err) => console.log('An error occurred: ', err));
-    // }    
+    if (serve) 
+    {
+      installExtension(REDUX_DEVTOOLS)
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
+    }    
     // win.webContents.openDevTools();
   });
 

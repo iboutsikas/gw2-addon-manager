@@ -64,23 +64,27 @@ export const addonsReducer = createReducer(
         });
         return { ...state, addons: newAddons }
     }),
-    on(actions.installAddonsSuccess, (state, action) => {
-        let newAddons = { ...state.addons };
-        let installed = { ...state.installed };
+    on(actions.installAddonsSuccess, 
+        actions.updateAddonsSuccess, 
+        (state, action) => {
+            let newAddons = { ...state.addons };
+            let installed = { ...state.installed };
 
-        for (let addon of action.addons) {
-            newAddons[addon.name] = {...newAddons[addon.name], being_processed: false}
-            installed[addon.name] = addon;
-        }
+            for (let addon of action.addons) {
+                newAddons[addon.name] = {...newAddons[addon.name], being_processed: false}
+                installed[addon.name] = addon;
+            }
 
-        return { ...state, addons: newAddons, installed: installed }
+            return { ...state, addons: newAddons, installed: installed }
     }),
-    on(actions.installAddonsFail, (state, action) => {
-        let newAddons = { ...state.addons };
-        for (let key of action.addonKeys) {
-            newAddons[key] = {...newAddons[key], being_processed: false}
-        }
-        return { ...state, addons: newAddons }
+    on(actions.installAddonsFail, 
+        actions.updateAddonsFail, 
+        (state, action) => {
+            let newAddons = { ...state.addons };
+            for (let key of action.addonKeys) {
+                newAddons[key] = {...newAddons[key], being_processed: false}
+            }
+            return { ...state, addons: newAddons }
     }),
     on(actions.uninstallAddons, (state, action) => {
         let newAddons = { ...state.addons };
@@ -99,5 +103,12 @@ export const addonsReducer = createReducer(
             delete installed[key];
         }
         return { ...state, addons: newAddons, installed: installed };
+    }),
+    on(actions.updateAddon, (state, action) => {
+        const newAddons = { ...state.addons };
+        const newAddon = { ...state.addons[action.addon.nickname], being_processed: true };
+        newAddons[action.addon.nickname] = newAddon;
+
+        return {...state, addons: newAddons }
     })
 )

@@ -6,7 +6,7 @@
                 <span class="addon-name">{{ addon.addon_name }}</span>
                 <span class="addon-version"
                       *ngIf="containsInstalledAddons && addon.version_id">
-                    {{ addon.version_id_is_human_readable ? addon.version_id : addon.version_id.substr(0, 8) }}
+                    {{ addon.version_id_is_human_readable ? addon.installed_version : addon.installed_version.substr(0, 8) }}
                 </span> 
             </div>
         </mat-cell>
@@ -53,16 +53,19 @@
 
 <ng-template #installedAddonsActions let-addon>
     <button mat-flat-button color="accent" 
-    *ngIf="addon.needsUpdate">
+        (click)="onUpdateClicked(addon)"
+        [disabled]="!addon.needs_update">
         Update
     </button>
     <button mat-stroked-button color="primary"
-    *ngIf="addon.status == 0"
+    *ngIf="addon.status == 1"
+    disabled="true"
     (click)="onDisableClicked(addon)">
         Disable
     </button>
     <button mat-stroked-button color="primary"
-    *ngIf="addon.status == 1"
+    *ngIf="addon.status == 0"
+    disabled="true"
     (click)="onEnableClicked(addon)">
         Enable
     </button>

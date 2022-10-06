@@ -18,6 +18,21 @@ export const installAddonsFail = createAction(
     props<{ addonKeys: string[] }>()
 )
 
+export const updateAddon = createAction(
+    '[Addons] Update addon',
+    props<{ addon: Addon }>()
+);
+
+export const updateAddonsSuccess = createAction(
+    '[Addons] Update addons success',
+    props<{ addons: InstalledAddonMetadata[] }>()
+)
+
+export const updateAddonsFail = createAction(
+    '[Addons] Update addons Fail',
+    props<{ addonKeys: string[] }>()
+)
+
 export const uninstallAddons = createAction(
     '[Addons] Uninstall addons',
     props<{ addonsToUninstall: HashMap<Addon> }>()

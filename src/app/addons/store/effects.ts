@@ -123,6 +123,41 @@ export class AddonEffects {
         map((keys: string[]) => addonActions.uninstallAddonsSuccess({ addonKeys: keys }))
     ));
 
+    updateAddons$ = this.actions$.pipe(
+        ofType(addonActions.updateAddon),
+        map(action => action.addon),
+        bufferDebounce(2 * 1000),
+        filter(updates => updates.length != 0),
+        map(updates => {
+            const result = [];
+            const hash = {};
+
+            for (let addon of updates) {
+
+                if (hash.hasOwnProperty(addon.nickname))
+                    continue;
+
+                hash[addon.nickname] = 1;
+                result.push(addon);
+            }
+            return result;
+        }),
+        observeOn(leaveZone(this.zone, asyncScheduler)),
+        switchMap((addons) => this.addonService.updateAddons(addons)),
+        observeOn(enterZone(this.zone, queueScheduler)),
+        shareReplay()
+    )
+
+    updateAddonsSuccess$ = createEffect(() => this.updateAddons$.pipe(
+        map((value: any) => value.successes),
+        map(updatedAddons => addonActions.updateAddonsSuccess({ addons: updatedAddons}))
+    ));
+
+    updateAddonsFail$ = createEffect(() => this.updateAddons$.pipe(
+        map((value: any) => value.failures),
+        map(keys => addonActions.updateAddonsFail({ addonKeys: keys}))
+    ));
+
 
     // @ts-ignore
     // updateStatus$ = createEffect(() => this.actions$.pipe(

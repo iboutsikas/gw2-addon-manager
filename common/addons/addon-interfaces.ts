@@ -42,6 +42,9 @@ export interface Addon {
     files? : string[];
     plugin_name_pattern?: string;
     plugin_name?: string;
+    needs_update?: boolean;
+    installed_version?: string;
+    status?: AddonStatus
 }
 
 export interface HashMap<TValue> {
