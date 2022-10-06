@@ -1,4 +1,4 @@
 *.js
 *js.map
 dist/
-common/
+common
