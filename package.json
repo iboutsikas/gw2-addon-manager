@@ -24,7 +24,7 @@
   "main": "app/dist/electron_main.js",
   "private": true,
   "scripts": {
-    "postinstall": "electron-builder install-app-deps && ln -s common app/common",
+    "postinstall": "electron-builder install-app-deps && cd app && ln -s ../common",
     "ng": "ng",
     "start": "npm-run-all -p electron:serve ng:serve",
     "ng:serve": "ng serve -c dev -o",
