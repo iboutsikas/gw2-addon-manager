@@ -39,8 +39,8 @@ export const selectInstalledAddons = createSelector(
                 addon.needs_update = addon.version_id != info[key].version;
             }
             else {
-                const cleanA = semver.clean(addon.version_id);
-                const cleanB = semver.clean(info[key].version);
+                const cleanA = semver.coerce(addon.version_id);
+                const cleanB = semver.coerce(info[key].version);
                 addon.needs_update = semver.gt(cleanA, cleanB);
             }
             addon.installed_version = info[key].version;
